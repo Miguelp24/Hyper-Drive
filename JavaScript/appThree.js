@@ -1,29 +1,35 @@
 import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-// Configuração da cena
+// ===== CONFIGURAÇÃO BÁSICA DA CENA =====
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 300); // Increased far clipping plane
-//const camera = new THREE.OrthographicCamera(-10, 10, 10, -5, 0.1, 1000); // Changed to OrthographicCamera for better performance
+// Câmara em perspectiva - fornece uma visão mais realista com profundidade
+const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 300); 
+// Câmara ortográfica - desativada por padrão, pode ser alternada para uma visão sem perspectiva
+//const camera = new THREE.OrthographicCamera(-10, 10, 10, -5, 0.1, 1000);
 camera.position.set(0, 5, 10);
 camera.lookAt(0, 0, 0);
 
+// Configuração do renderizador - responsável por desenhar a cena na tela
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Basic lighting - important for models to be visible
+// ===== ILUMINAÇÃO DA CENA =====
+// Luz ambiente - ilumina toda a cena uniformemente, sem direção específica
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
 
+// Luz direcional - simula a luz do sol, vem de uma direção específica
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight.position.set(0, 10, 10);
 scene.add(directionalLight);
 
-// Carregar Skybox
+// ===== SKYBOX (CENÁRIO DE FUNDO) =====
+// Cria um "céu" ao redor do jogo usando um cubo com texturas nas faces internas
 let materialArray = [];
 
-// Load das texturas
+// Carregamento das texturas para cada face do skybox
 let texture_ft = new THREE.TextureLoader().load("assets/texture/skybox/meadow_ft.jpg");
 let texture_bk = new THREE.TextureLoader().load("assets/texture/skybox/meadow_bk.jpg");
 let texture_up = new THREE.TextureLoader().load("assets/texture/skybox/meadow_up.jpg");
@@ -31,56 +37,54 @@ let texture_dn = new THREE.TextureLoader().load("assets/texture/skybox/meadow_dn
 let texture_rt = new THREE.TextureLoader().load("assets/texture/skybox/meadow_rt.jpg");
 let texture_lf = new THREE.TextureLoader().load("assets/texture/skybox/meadow_lf.jpg");
 
-// Materials para cada face do skybox - in correct order for BoxGeometry
-materialArray.push(new THREE.MeshBasicMaterial({ map: texture_ft })); // front
-materialArray.push(new THREE.MeshBasicMaterial({ map: texture_bk })); // back
-materialArray.push(new THREE.MeshBasicMaterial({ map: texture_up })); // up
-materialArray.push(new THREE.MeshBasicMaterial({ map: texture_dn })); // down
-materialArray.push(new THREE.MeshBasicMaterial({ map: texture_rt })); // right
-materialArray.push(new THREE.MeshBasicMaterial({ map: texture_lf })); // left
+// Aplicação das texturas aos materiais para cada face do cubo
+materialArray.push(new THREE.MeshBasicMaterial({ map: texture_ft })); // frente
+materialArray.push(new THREE.MeshBasicMaterial({ map: texture_bk })); // trás
+materialArray.push(new THREE.MeshBasicMaterial({ map: texture_up })); // cima
+materialArray.push(new THREE.MeshBasicMaterial({ map: texture_dn })); // baixo
+materialArray.push(new THREE.MeshBasicMaterial({ map: texture_rt })); // direita
+materialArray.push(new THREE.MeshBasicMaterial({ map: texture_lf })); // esquerda
 
-// Ver o interior do cubo
+// Configura os materiais para serem visíveis do lado interno do cubo
 for (let i = 0; i < 6; i++) {
     materialArray[i].side = THREE.BackSide;
 }
 
-// Criar um cubo para o skybox (reduzido para melhor visibilidade)
+// Criação e adição do skybox à cena
 let skyboxGeo = new THREE.BoxGeometry(100, 100, 100);
 let skybox = new THREE.Mesh(skyboxGeo, materialArray);
 scene.add(skybox);
 
-// Luz
+// Luz adicional para melhorar a visibilidade
 const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(0, 10, 10);
 scene.add(light);
 
-// Carregar textura da estrada
+// ===== ESTRADA =====
+// Carregamento e configuração da textura da estrada
 const roadTextureLoader = new THREE.TextureLoader();
 const roadTexture = roadTextureLoader.load('assets/texture/road.jpg');
-roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
-roadTexture.repeat.set(2, 20); // Double width repeat (2 instead of 1)
+roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping; // Permite repetição da textura
+roadTexture.repeat.set(2, 20); // Configura a repetição (largura, comprimento)
 
-// Estrada - made wider and longer
-const roadGeometry = new THREE.PlaneGeometry(20, 200); // Double width (20 instead of 10)
+// Criação da geometria da estrada - plano largo e comprido
+const roadGeometry = new THREE.PlaneGeometry(20, 200);
 const roadMaterial = new THREE.MeshBasicMaterial({ map: roadTexture, side: THREE.DoubleSide });
 const road = new THREE.Mesh(roadGeometry, roadMaterial);
-road.rotation.x = -Math.PI / 2;
-road.position.set(0, 0, -70); // Position it further back
+road.rotation.x = -Math.PI / 2; // Rotaciona para ficar na horizontal
+road.position.set(0, 0, -70); // Posiciona à frente do jogador
 scene.add(road);
 
-// SIMPLIFIED GUARD RAILS - 3D objects only, positioned lower
-// Keep the existing support posts but make them lower
+// ===== GUARDA-RAILS =====
+// Geometria comum para os postes dos guarda-rails
 const postGeometry = new THREE.BoxGeometry(0.2, 1.5, 0.2);
 const postMaterial = new THREE.MeshPhongMaterial({ color: 0x777777 });
 
-// Create arrays to track rail objects for animation
+// Arrays para rastrear objetos para animação
 const railPosts = [];
 const railElements = [];
 
-// IMPROVED GUARD RAILS IMPLEMENTATION
-// Remove existing rail code first
-
-// Create two groups for each side (for continuous scrolling)
+// Criação de grupos para permitir movimentação contínua dos guarda-rails
 const leftRailGroup1 = new THREE.Group();
 const leftRailGroup2 = new THREE.Group();
 const rightRailGroup1 = new THREE.Group();
@@ -90,41 +94,41 @@ scene.add(leftRailGroup2);
 scene.add(rightRailGroup1);
 scene.add(rightRailGroup2);
 
-// Define dimensions
+// Definição de dimensões dos guarda-rails
 const railLength = 200;
 const postSpacing = 5;
 
-// Create posts and rails for first set
+// Criação dos postes para o primeiro conjunto de guarda-rails
 for (let z = 0; z < railLength; z += postSpacing) {
-    // Left posts
+    // Postes esquerdos
     const leftPost = new THREE.Mesh(postGeometry, postMaterial);
     leftPost.position.set(0, 0.40, z);
     leftRailGroup1.add(leftPost);
     
-    // Right posts
+    // Postes direitos
     const rightPost = new THREE.Mesh(postGeometry, postMaterial);
     rightPost.position.set(0, 0.40, z);
     rightRailGroup1.add(rightPost);
 }
 
-// Create posts for second set (identical but positioned differently)
+// Criação dos postes para o segundo conjunto de guarda-rails
 for (let z = 0; z < railLength; z += postSpacing) {
-    // Left posts
+    // Postes esquerdos
     const leftPost = new THREE.Mesh(postGeometry, postMaterial);
     leftPost.position.set(0, 0.40, z);
     leftRailGroup2.add(leftPost);
     
-    // Right posts
+    // Postes direitos
     const rightPost = new THREE.Mesh(postGeometry, postMaterial);
     rightPost.position.set(0, 0.40, z);
     rightRailGroup2.add(rightPost);
 }
 
-// Create horizontal rails for both sets
+// Criação das barras horizontais dos guarda-rails
 const horizontalRailGeometry = new THREE.BoxGeometry(0.2, 0.2, railLength);
 const horizontalRailMaterial = new THREE.MeshPhongMaterial({ color: 0xAAAAAA });
 
-// Top and middle rails for first set
+// Barras horizontais para o primeiro conjunto
 const leftTopRail1 = new THREE.Mesh(horizontalRailGeometry, horizontalRailMaterial);
 leftTopRail1.position.set(0, 1.1, railLength/2);
 leftRailGroup1.add(leftTopRail1);
@@ -141,7 +145,7 @@ const rightMiddleRail1 = new THREE.Mesh(horizontalRailGeometry, horizontalRailMa
 rightMiddleRail1.position.set(0, 0.7, railLength/2);
 rightRailGroup1.add(rightMiddleRail1);
 
-// Top and middle rails for second set
+// Barras horizontais para o segundo conjunto
 const leftTopRail2 = new THREE.Mesh(horizontalRailGeometry, horizontalRailMaterial);
 leftTopRail2.position.set(0, 1.1, railLength/2);
 leftRailGroup2.add(leftTopRail2);
@@ -158,16 +162,14 @@ const rightMiddleRail2 = new THREE.Mesh(horizontalRailGeometry, horizontalRailMa
 rightMiddleRail2.position.set(0, 0.7, railLength/2);
 rightRailGroup2.add(rightMiddleRail2);
 
-// Position the groups properly
+// Posicionamento dos grupos de guarda-rails
 leftRailGroup1.position.set(-10, 0, -170);
 leftRailGroup2.position.set(-10, 0, -170 - railLength);
 rightRailGroup1.position.set(10, 0, -170);
 rightRailGroup2.position.set(10, 0, -170 - railLength);
 
-
-//////
-
-// Create a basic player car placeholder while the model loads
+// ===== CARROS =====
+// Criação de um carro temporário (placeholder) enquanto o modelo carrega
 let car = new THREE.Group();
 const tempCarGeometry = new THREE.BoxGeometry(2, 1, 4);
 const tempCarMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true });
@@ -177,10 +179,10 @@ car.add(tempCar);
 car.position.set(0, 0.5, 5);
 scene.add(car);
 
-// Simple obstacle car model
+// Variável para armazenar o modelo do carro obstáculo
 let obstacleCarModel = null;
 
-// Load player car model
+// Carregamento do modelo do carro do jogador usando FBXLoader
 console.log("Loading player car model...");
 const fbxLoader = new FBXLoader();
 fbxLoader.load(
@@ -188,17 +190,17 @@ fbxLoader.load(
     (object) => {
         console.log("Player car model loaded successfully!");
         
-        // Remove the placeholder car
+        // Remove o carro temporário
         scene.remove(car);
         
-        // Load texture for player car
+        // Carrega a textura para o carro do jogador
         const textureLoader = new THREE.TextureLoader();
         const carTexture = textureLoader.load('assets/Low Poly Cars (Free)_fbx/Textures/Car Texture 2.png');
         
-        // Apply texture to all meshes in the model
+        // Aplica a textura a todas as partes do modelo
         object.traverse((child) => {
             if (child.isMesh) {
-                // Create a new material with the texture
+                // Cria um novo material com a textura
                 child.material = new THREE.MeshPhongMaterial({
                     map: carTexture,
                     shininess: 10
@@ -206,12 +208,12 @@ fbxLoader.load(
             }
         });
         
-        // Scale and position the new model
+        // Ajusta a escala e posição do modelo
         object.scale.set(1.5, 1.5, 1.5);
         object.rotation.set(Math.PI/2, 0, Math.PI/2);
         object.position.set(0, 0.5, 5);
         
-        // Use this as our player car
+        // Usa este como o carro do jogador
         car = object;
         scene.add(car);
         
@@ -225,21 +227,21 @@ fbxLoader.load(
     }
 );
 
-// Load obstacle car model
+// Carregamento do modelo do carro obstáculo
 console.log("Loading obstacle car model...");
 fbxLoader.load(
     'assets/Low Poly Cars (Free)_fbx/Models/car_1.fbx',
     (object) => {
         console.log("Obstacle car model loaded successfully!");
         
-        // Load texture for obstacle car
+        // Carrega a textura para o carro obstáculo
         const textureLoader = new THREE.TextureLoader();
         const obstacleTexture = textureLoader.load('assets/Low Poly Cars (Free)_fbx/Textures/Car Texture 1.png');
         
-        // Apply texture to all meshes in the model
+        // Aplica a textura a todas as partes do modelo
         object.traverse((child) => {
             if (child.isMesh) {
-                // Create a new material with the texture
+                // Cria um novo material com a textura
                 child.material = new THREE.MeshPhongMaterial({
                     map: obstacleTexture,
                     shininess: 10
@@ -247,13 +249,13 @@ fbxLoader.load(
             }
         });
         
-        // Scale model appropriately
+        // Ajusta a escala do modelo
         object.scale.set(1.5, 1.5, 1.5);
         
-        // Rotate to face forward - same rotation as player car
+        // Rotaciona para apontar para a frente - mesma rotação do carro do jogador
         object.rotation.set(Math.PI/2, 0, Math.PI/2);
 
-        // Save for later cloning
+        // Salva para clonagem posterior
         obstacleCarModel = object;
         
         console.log("Obstacle car model ready with texture applied");
@@ -266,31 +268,33 @@ fbxLoader.load(
     }
 );
 
-// Add this after loading the car models (outside the animate function)
-// This will store our collision helpers
+// ===== SISTEMA DE COLISÃO =====
+// Caixas delimitadoras para detecção de colisão
 const carBoundingBox = new THREE.Box3();
 const obstacleBoundingBox = new THREE.Box3();
 
-// Variável para controlar a velocidade do jogo
+// ===== VARIÁVEIS DE JOGO =====
+// Controla a velocidade global do jogo
 let gameSpeed = 1.0;
 let lastSpeedIncrease = 0;
 
-// Variável para armazenar o ID da animação
+// ID da animação para controle de loop
 let animationFrameId;
 
-// Obstáculos (agora são carros)
+// Array para armazenar obstáculos ativos
 const obstacles = [];
 
-// Updated obstacle creation function
+// ===== CRIAÇÃO DE OBSTÁCULOS =====
+// Função para criar carros obstáculos
 function createObstacle() {
-    // Create a car model instead of a box
+    // Cria um modelo de carro obstáculo
     let obstacleCar;
     
     if (obstacleCarModel) {
-        // Use the loaded model if available
+        // Usa o modelo carregado, se disponível
         obstacleCar = obstacleCarModel.clone();
     } else {
-        // Use a placeholder if model hasn't loaded yet
+        // Usa um placeholder se o modelo ainda não carregou
         obstacleCar = new THREE.Group();
         const tempObstacleGeometry = new THREE.BoxGeometry(1.5, 0.8, 3);
         const tempObstacleMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
@@ -299,20 +303,22 @@ function createObstacle() {
         obstacleCar.add(tempObstacle);
     }
     
-    // Position in one of the lanes
-    const position = Math.floor(Math.random() * 4); // 0, 1, 2, or 3
-    let xPos = -7.5; // Lane 1 center
-    if (position === 1) xPos = -2.5; // Lane 2 center
-    if (position === 2) xPos = 2.5;  // Lane 3 center
-    if (position === 3) xPos = 7.5;  // Lane 4 center
+    // Posiciona em uma das quatro pistas aleatoriamente
+    const position = Math.floor(Math.random() * 4); // 0, 1, 2, ou 3
+    let xPos = -7.5; // Centro da pista 1
+    if (position === 1) xPos = -2.5; // Centro da pista 2
+    if (position === 2) xPos = 2.5;  // Centro da pista 3
+    if (position === 3) xPos = 7.5;  // Centro da pista 4
     
     obstacleCar.position.set(xPos, 0.5, -70);
     scene.add(obstacleCar);
     obstacles.push(obstacleCar);
 }
+// Cria novos obstáculos a cada 2 segundos
 setInterval(createObstacle, 2000);
 
-// Score
+// ===== INTERFACE DE USUÁRIO =====
+// Elemento de pontuação
 let score = 0;
 const scoreElement = document.createElement('div');
 scoreElement.style.position = 'absolute';
@@ -323,14 +329,14 @@ scoreElement.style.fontSize = '20px';
 scoreElement.innerHTML = `Score: ${score}`;
 document.body.appendChild(scoreElement);
 
-// Game Over Element
+// Elemento de Game Over
 const gameOverContainer = document.createElement('div');
 gameOverContainer.style.position = 'absolute';
 gameOverContainer.style.top = '50%';
 gameOverContainer.style.left = '50%';
 gameOverContainer.style.transform = 'translate(-50%, -50%)';
 gameOverContainer.style.textAlign = 'center';
-gameOverContainer.style.display = 'none'; // Hidden initially
+gameOverContainer.style.display = 'none'; // Inicialmente escondido
 document.body.appendChild(gameOverContainer);
 
 const gameOverElement = document.createElement('div');
@@ -346,7 +352,7 @@ finalScoreElement.style.fontSize = '36px';
 finalScoreElement.style.marginTop = '20px';
 gameOverContainer.appendChild(finalScoreElement);
 
-// Criar botão de Restart
+// Botão de reiniciar
 const restartButton = document.createElement('button');
 restartButton.style.marginTop = '30px';
 restartButton.style.padding = '15px 30px';
@@ -359,7 +365,7 @@ restartButton.style.cursor = 'pointer';
 restartButton.innerHTML = 'Restart';
 gameOverContainer.appendChild(restartButton);
 
-// Adicionar evento de clique para reiniciar o jogo
+// Evento de clique para reiniciar o jogo
 restartButton.addEventListener('click', () => {
     // Resetar variáveis do jogo
     gameOver = false;
@@ -371,7 +377,7 @@ restartButton.addEventListener('click', () => {
     
     // Resetar posição do carro com a rotação correta
     car.position.set(0, 0.5, 5);
-    car.rotation.set(Math.PI/2, 0, Math.PI/2); // Correct rotation
+    car.rotation.set(Math.PI/2, 0, Math.PI/2); // Rotação correta
     
     // Remover obstáculos existentes
     for (let i = obstacles.length - 1; i >= 0; i--) {
@@ -382,7 +388,7 @@ restartButton.addEventListener('click', () => {
     // Esconder o painel de Game Over
     gameOverContainer.style.display = 'none';
     
-    // Resetar posição dos guard rails
+    // Resetar posição dos guarda-rails
     leftRailGroup1.position.set(-10, 0, -170);
     leftRailGroup2.position.set(-10, 0, -170 - railLength);
     rightRailGroup1.position.set(10, 0, -170);
@@ -401,9 +407,8 @@ restartButton.addEventListener('click', () => {
     animate();
 });
 
-// Add this after your other UI elements (score, game over panel, etc.)
-
-// Create a controls panel
+// ===== PAINEL DE CONTROLES =====
+// Criação do painel de controles
 const controlsPanel = document.createElement('div');
 controlsPanel.style.position = 'absolute';
 controlsPanel.style.top = '10px';
@@ -416,7 +421,7 @@ controlsPanel.style.fontFamily = 'Arial, sans-serif';
 controlsPanel.style.width = '220px';
 document.body.appendChild(controlsPanel);
 
-// Panel title
+// Título do painel
 const panelTitle = document.createElement('div');
 panelTitle.innerHTML = 'Controls';
 panelTitle.style.fontSize = '18px';
@@ -425,7 +430,7 @@ panelTitle.style.marginBottom = '10px';
 panelTitle.style.textAlign = 'center';
 controlsPanel.appendChild(panelTitle);
 
-// 1. Camera Controls
+// ===== CONTROLES DE CÂMERA =====
 const cameraSection = document.createElement('div');
 cameraSection.style.marginBottom = '15px';
 controlsPanel.appendChild(cameraSection);
@@ -435,14 +440,12 @@ cameraLabel.innerHTML = 'Camera Type:';
 cameraLabel.style.marginBottom = '5px';
 cameraSection.appendChild(cameraLabel);
 
-// Create and maintain two cameras
-// perspectiveCamera is already defined in your code
-// Create orthographic camera
+// Criação da câmera ortográfica (alternativa)
 const orthographicCamera = new THREE.OrthographicCamera(-10, 10, 10, -5, 0.1, 1000);
 orthographicCamera.position.set(0, 5, 10);
 orthographicCamera.lookAt(0, 0, 0);
 
-// Camera toggle button
+// Botão para alternar entre câmeras
 const cameraToggle = document.createElement('button');
 cameraToggle.style.width = '100%';
 cameraToggle.style.padding = '5px';
@@ -454,26 +457,27 @@ cameraToggle.style.borderRadius = '3px';
 cameraToggle.style.color = 'white';
 cameraSection.appendChild(cameraToggle);
 
-// Track current camera
-let currentCamera = camera; // Use the existing camera as default (perspective)
+// Variáveis de controle da câmera
+let currentCamera = camera; // Usa a câmera existente como padrão (perspectiva)
 let usingPerspective = true;
 
+// Evento para alternar entre câmeras
 cameraToggle.addEventListener('click', () => {
     if (usingPerspective) {
-        // Switch to orthographic
+        // Muda para câmera ortográfica
         currentCamera = orthographicCamera;
         cameraToggle.innerHTML = 'Orthographic Camera';
         cameraToggle.style.backgroundColor = '#2196F3';
     } else {
-        // Switch to perspective
-        currentCamera = camera; // The existing perspective camera
+        // Muda para câmera perspectiva
+        currentCamera = camera; // A câmera perspectiva existente
         cameraToggle.innerHTML = 'Perspective Camera';
         cameraToggle.style.backgroundColor = '#4CAF50';
     }
     usingPerspective = !usingPerspective;
 });
 
-// 2. Light Controls
+// ===== CONTROLES DE ILUMINAÇÃO =====
 const lightSection = document.createElement('div');
 controlsPanel.appendChild(lightSection);
 
@@ -482,13 +486,12 @@ lightLabel.innerHTML = 'Light Sources:';
 lightLabel.style.marginBottom = '5px';
 lightSection.appendChild(lightLabel);
 
-// Add a PointLight since it's not in the scene yet
-const pointLight = new THREE.PointLight(0xff9000, 1.5, 30, 1);  // Orange color, higher intensity, limited distance, decay
-pointLight.position.set(0, 5, 0); // Position directly above the player car
+// Adiciona uma luz pontual (não incluída anteriormente)
+const pointLight = new THREE.PointLight(0xff9000, 1.5, 30, 1);  // Cor laranja, maior intensidade, distância limitada
+pointLight.position.set(0, 5, 0); // Posicionada acima do carro do jogador
 scene.add(pointLight);
 
-
-// Create light toggle buttons
+// Função para criar botões de alternância de luzes
 function createLightToggle(name, light, defaultOn = true) {
     const toggle = document.createElement('button');
     toggle.style.width = '100%';
@@ -499,7 +502,7 @@ function createLightToggle(name, light, defaultOn = true) {
     toggle.style.borderRadius = '3px';
     toggle.style.color = 'white';
     
-    // Set initial state
+    // Define o estado inicial
     light.visible = defaultOn;
     toggle.innerHTML = name + ': ON';
     toggle.style.backgroundColor = '#4CAF50';
@@ -518,7 +521,7 @@ function createLightToggle(name, light, defaultOn = true) {
     return toggle;
 }
 
-// Create toggle for each light type
+// Cria botões para cada tipo de luz
 const ambientToggle = createLightToggle('Ambient Light', ambientLight);
 const directionalToggle = createLightToggle('Directional Light', directionalLight);
 const pointToggle = createLightToggle('Point Light', pointLight);
@@ -527,18 +530,18 @@ lightSection.appendChild(ambientToggle);
 lightSection.appendChild(directionalToggle);
 lightSection.appendChild(pointToggle);
 
-// Add a function to animate the point light to make it more noticeable
+// Função para animar a luz pontual
 function animatePointLight() {
-    // Make the point light follow the player car
+    // Faz a luz pontual seguir o carro do jogador
     pointLight.position.x = car.position.x;
     pointLight.position.z = car.position.z + 2;
     
-    // Optional: add subtle pulsing effect
+    // Efeito de pulsação sutil
     const time = Date.now() * 0.001;
-    pointLight.intensity = 1.5 + Math.sin(time * 2) * 0.3; // Intensity fluctuates between 1.2 and 1.8
+    pointLight.intensity = 1.5 + Math.sin(time * 2) * 0.3; // Intensidade flutua entre 1.2 e 1.8
 }
 
-// Movimento do carro
+// ===== CONTROLES DE MOVIMENTO =====
 let moveLeft = false, moveRight = false;
 document.addEventListener('keydown', (event) => {
     if (event.key === 'a') moveLeft = true;
@@ -549,7 +552,7 @@ document.addEventListener('keyup', (event) => {
     if (event.key === 'd') moveRight = false;
 });
 
-// Loop do jogo
+// ===== LOOP PRINCIPAL DO JOGO =====
 let gameOver = false;
 let collisionAnimating = false;
 let collisionTime = 0;
@@ -558,16 +561,16 @@ const collisionAnimationDuration = 70;
 function animate() {
     animationFrameId = requestAnimationFrame(animate);
     
+    // Lógica de game over e animação de colisão
     if (gameOver) {
-        // Collision animation code remains unchanged
         if (collisionAnimating) {
-            car.rotation.z += 0.1;
+            car.rotation.z += 0.1; // Faz o carro girar após colisão
             
             collisionTime++;
             
             if (collisionTime >= collisionAnimationDuration) {
                 collisionAnimating = false;
-                gameOverContainer.style.display = 'block';
+                gameOverContainer.style.display = 'block'; // Mostra o painel de game over
             }
             
             renderer.render(scene, currentCamera);
@@ -575,12 +578,12 @@ function animate() {
         return;
     }
 
-    // Speed increase logic remains unchanged
+    // Aumento de velocidade com base na pontuação
     if (score >= lastSpeedIncrease + 1000) {
         gameSpeed += 0.1;
         lastSpeedIncrease = Math.floor(score / 1000) * 1000;
         
-        // Visual indicator code remains unchanged
+        // Indicador visual de aumento de velocidade
         const speedIndicator = document.createElement('div');
         speedIndicator.style.position = 'absolute';
         speedIndicator.style.top = '50%';
@@ -596,32 +599,30 @@ function animate() {
         }, 2000);
     }
 
-    // FIXED SYNCHRONIZED SPEEDS
-    // Base speed values - same base for all movements
+    // Cálculo de velocidades sincronizadas
     const baseTextureSpeed = 0.01;
     const baseObjectSpeed = 1.0;
     
-    // Calculate speeds with game speed multiplier
+    // Velocidades ajustadas pelo multiplicador de velocidade do jogo
     const textureSpeed = baseTextureSpeed * gameSpeed;
     const objectSpeed = baseObjectSpeed * gameSpeed;
     
-    // Road texture scrolling
+    // Rolagem da textura da estrada
     roadTexture.offset.y += textureSpeed;
     
-    // Calculate a movement speed that visually matches the texture scroll rate
-    // This is the key to synchronization
-    const railMoveSpeed = objectSpeed * 0.1; // Double the previous value (was 0.04)
+    // Velocidade de movimento dos guarda-rails sincronizada com a textura
+    const railMoveSpeed = objectSpeed * 0.1;
     
-    // Move physical guard rail elements
+    // Movimento dos elementos dos guarda-rails
     for (let post of railPosts) {
         post.position.z += railMoveSpeed;
-        // Reset posts when they get too far ahead
+        // Reposiciona os postes quando avançam muito
         if (post.position.z > 30) {
-            post.position.z -= 200; // Move back to beginning
+            post.position.z -= 200; // Volta para o início
         }
     }
     
-    // Move horizontal rails
+    // Movimento das barras horizontais
     for (let element of railElements) {
         element.position.z += railMoveSpeed;
         if (element.position.z > 30) {
@@ -629,13 +630,13 @@ function animate() {
         }
     }
     
-    // Move rail groups
+    // Movimento dos grupos de guarda-rails
     leftRailGroup1.position.z += railMoveSpeed;
     leftRailGroup2.position.z += railMoveSpeed;
     rightRailGroup1.position.z += railMoveSpeed;
     rightRailGroup2.position.z += railMoveSpeed;
 
-    // Reset rail groups when they move too far
+    // Reposiciona os grupos de guarda-rails quando avançam muito
     if (leftRailGroup1.position.z > 30) {
         leftRailGroup1.position.z = leftRailGroup2.position.z - railLength;
     }
@@ -649,29 +650,24 @@ function animate() {
         rightRailGroup2.position.z = rightRailGroup1.position.z - railLength;
     }
     
-    // Car movement speed
+    // Movimento do carro do jogador
     const carSpeed = objectSpeed * 0.15;
     if (moveLeft && car.position.x > -9) car.position.x -= carSpeed;
     if (moveRight && car.position.x < 9) car.position.x += carSpeed;
 
-    // Obstacle movement
+    // Movimento e detecção de colisão com obstáculos
     for (let i = 0; i < obstacles.length; i++) {
-        // Obstacle cars move at 40% of the player car speed
+        // Carros obstáculo movem-se a 40% da velocidade do jogador
         obstacles[i].position.z += objectSpeed * 0.04;
         
-        // Only check collision if obstacle is close enough to the player
+        // Só verifica colisão se o obstáculo estiver próximo do jogador
         if (obstacles[i].position.z > 0 && obstacles[i].position.z < 10) {
-            // Create bounding boxes for both cars that update with their positions
+            // Cria caixas delimitadoras para ambos os carros que atualizam com suas posições
             carBoundingBox.setFromObject(car);
             obstacleBoundingBox.setFromObject(obstacles[i]);
             
-            // Check if the bounding boxes intersect (true collision)
+            // Verifica se as caixas delimitadoras se intersectam (colisão real)
             if (carBoundingBox.intersectsBox(obstacleBoundingBox)) {
-                // Debugging - uncomment if needed to test collision points
-                // console.log("Collision detected!");
-                // console.log("Car bounds:", carBoundingBox.min, carBoundingBox.max);
-                // console.log("Obstacle bounds:", obstacleBoundingBox.min, obstacleBoundingBox.max);
-                
                 gameOver = true;
                 collisionAnimating = true;
                 finalScoreElement.innerHTML = `Score: ${score}`;
@@ -679,7 +675,7 @@ function animate() {
             }
         }
         
-        // Object cleanup
+        // Limpeza de objetos que passaram
         if (obstacles[i].position.z > 20) {
             scene.remove(obstacles[i]);
             obstacles.splice(i, 1);
@@ -687,14 +683,77 @@ function animate() {
         }
     }
 
-    // Score update remains unchanged
+    // Atualização da pontuação
     score += 1;
     scoreElement.innerHTML = `Score: ${score}`;
 
+    // Anima a luz pontual se estiver visível
     if (!gameOver && pointLight.visible) {
         animatePointLight();
     }
 
+    // Renderiza a cena usando a câmera atual
     renderer.render(scene, currentCamera);
 }
-animate();
+animate(); // Inicia o loop de animação
+
+
+/*
+===== ÍNDICE DO CÓDIGO =====
+O código está organizado nas seguintes seções:
+
+1. CONFIGURAÇÃO BÁSICA
+   - Imports: linhas 1-2
+   - Configuração da cena: linhas 4-5
+   - Configuração das câmeras: linhas 6-10
+   - Configuração do renderizador: linhas 12-14
+
+2. ILUMINAÇÃO DA CENA
+   - Luz ambiente: linhas 17-18
+   - Luz direcional: linhas 20-22
+   - Luz pontual (point light): linhas 436-438
+
+3. CENÁRIO
+   - Skybox: linhas 25-49
+   - Estrada: linhas 56-66
+   - Guarda-Rails: linhas 68-162
+
+4. VEÍCULOS
+   - Carro temporário (placeholder): linhas 165-171
+   - Carro do jogador (FBX): linhas 176-212
+   - Carro obstáculo (FBX): linhas 215-253
+
+5. MECÂNICAS DE JOGO
+   - Sistema de colisão: linhas 256-257
+   - Velocidade do jogo: linhas 260-261
+   - Geração de obstáculos: linhas 276-303
+   - Interface de pontuação: linhas 306-312
+   - Tela de Game Over: linhas 314-357
+
+6. CONTROLES DE JOGO
+   - Painel de controles: linhas 360-379
+   - Controles de câmera: linhas 382-416
+   - Controles de iluminação: linhas 419-466
+   - Controles de movimento: linhas 469-476
+
+7. LOOP DE ANIMAÇÃO
+   - Variáveis de controle: linhas 479-482
+   - Função principal animate(): linhas 484-571
+   - Detecção de colisões: linhas 533-550
+   - Aumento de velocidade: linhas 489-508
+   - Animação de elementos: linhas 519-532
+
+As seções mais importantes a verificar em caso de problemas são:
+- Carregamento de modelos 3D: linhas 176-253
+- Sistema de colisão: linhas 533-550
+- Loop principal do jogo: linhas 484-571
+*/
+
+// ===== FIM DO CÓDIGO =====
+
+//Entregas
+//Semana 1 (dia 28): 1,2,3,6
+//Semana 2 (dia 5): 4
+//Semana 3 (dia 12): 5
+//Semana 4 (dia 19): 7
+
