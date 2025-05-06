@@ -15,7 +15,7 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// ===== ILUMINAÇÃO DA CENA =====
+// ===== ILUMINAÇÃO DA CENA ====
 // Luz ambiente - ilumina toda a cena uniformemente, sem direção específica
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
@@ -275,7 +275,7 @@ const obstacleBoundingBox = new THREE.Box3();
 
 // ===== VARIÁVEIS DE JOGO =====
 // Controla a velocidade global do jogo
-let gameSpeed = 1.0;
+let gameSpeed = 1.0; 
 let lastSpeedIncrease = 0;
 
 // ID da animação para controle de loop
@@ -557,9 +557,17 @@ let gameOver = false;
 let collisionAnimating = false;
 let collisionTime = 0;
 const collisionAnimationDuration = 70;
+let lastTime = 0; // Nova variável para controle de tempo
 
-function animate() {
+function animate(currentTime = 0) {
     animationFrameId = requestAnimationFrame(animate);
+    
+    // Calcula o delta time (tempo decorrido entre frames em segundos)
+    const deltaTime = (currentTime - lastTime) / 1000; 
+    lastTime = currentTime;
+    
+    // Limita o delta time para evitar saltos grandes após pausas
+    const clampedDelta = Math.min(deltaTime, 0.1);
     
     // Lógica de game over e animação de colisão
     if (gameOver) {
@@ -600,12 +608,12 @@ function animate() {
     }
 
     // Cálculo de velocidades sincronizadas
-    const baseTextureSpeed = 0.01;
-    const baseObjectSpeed = 1.0;
+    const baseTextureSpeed = 1.2; // Aumentamos o valor base para compensar o deltaTime
+    const baseObjectSpeed = 120.0; // Aumentamos o valor base para compensar o deltaTime
     
-    // Velocidades ajustadas pelo multiplicador de velocidade do jogo
-    const textureSpeed = baseTextureSpeed * gameSpeed;
-    const objectSpeed = baseObjectSpeed * gameSpeed;
+    // Velocidades ajustadas pelo multiplicador e deltaTime
+    const textureSpeed = baseTextureSpeed * gameSpeed * clampedDelta;
+    const objectSpeed = baseObjectSpeed * gameSpeed * clampedDelta;
     
     // Rolagem da textura da estrada
     roadTexture.offset.y += textureSpeed;
@@ -650,7 +658,7 @@ function animate() {
         rightRailGroup2.position.z = rightRailGroup1.position.z - railLength;
     }
     
-    // Movimento do carro do jogador
+    // Movimento do carro do jogador também ajustado com deltaTime
     const carSpeed = objectSpeed * 0.15;
     if (moveLeft && car.position.x > -9) car.position.x -= carSpeed;
     if (moveRight && car.position.x < 9) car.position.x += carSpeed;
@@ -683,8 +691,8 @@ function animate() {
         }
     }
 
-    // Atualização da pontuação
-    score += 1;
+    // Atualização da pontuação - ajustada com deltaTime para manter consistente
+    score += Math.round(60 * clampedDelta); // Aproximadamente 1 ponto por frame a 60fps
     scoreElement.innerHTML = `Score: ${score}`;
 
     // Anima a luz pontual se estiver visível
@@ -752,7 +760,8 @@ As seções mais importantes a verificar em caso de problemas são:
 // ===== FIM DO CÓDIGO =====
 
 //Entregas
-//Semana 1 (dia 28): 1,2,3,6
+//Semana 0 (dia 21): 1,2,3
+//Semana 1 (dia 28): 6
 //Semana 2 (dia 5): 4
 //Semana 3 (dia 12): 5
 //Semana 4 (dia 19): 7
