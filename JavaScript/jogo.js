@@ -1,6 +1,21 @@
 import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
+
+// Musica
+
+const bgMusic = document.createElement('audio');
+bgMusic.src = 'assets/music.mp3'; // Caminho para sua música
+bgMusic.loop = true;
+bgMusic.volume = 0.1; // Volume de 0 a 1
+document.body.appendChild(bgMusic);
+
+const collisionMusic = document.createElement('audio');
+collisionMusic.src = 'assets/crashMusic.mp3'; // Coloque o caminho do seu áudio de colisão
+collisionMusic.volume = 0.1;
+collisionMusic.preload = 'auto';
+document.body.appendChild(collisionMusic);
+
 // ===== CONFIGURAÇÃO BÁSICA DA CENA =====
 const scene = new THREE.Scene();
 // Câmara em perspectiva - fornece uma visão mais realista com profundidade
@@ -201,6 +216,149 @@ leftRailGroup1.position.set(-10, 0, -170);
 leftRailGroup2.position.set(-10, 0, -170 - railLength);
 rightRailGroup1.position.set(10, 0, -170);
 rightRailGroup2.position.set(10, 0, -170 - railLength);
+
+// ===== AIRPLANE =====
+let airplane = null;
+let airplaneDirection = 1; // 1 = right to left, -1 = left to right
+const AIRPLANE_SPEED = 0.1;
+const AIRPLANE_HEIGHT = 15;
+const AIRPLANE_TURN_POINT = 50;
+
+function createSimpleAirplane() {
+    const airplaneGroup = new THREE.Group();
+    
+    // Cores
+    const bodyColor = 0xf5f5f5;  // Branco
+    const wingColor = 0xc0c0c0;  // Cinza claro
+    const detailColor = 0x333333; // Cinza escuro
+    const propellerColor = 0x222222; // Quase preto
+    
+    // Fuselagem (corpo principal)
+    const fuselage = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.5, 0.5, 4, 8),
+        new THREE.MeshPhongMaterial({ color: bodyColor })
+    );
+    fuselage.rotation.z = Math.PI / 2;
+    airplaneGroup.add(fuselage);
+    
+    // Nariz/Cabine
+    const nose = new THREE.Mesh(
+        new THREE.ConeGeometry(0.5, 1.4, 8),
+        new THREE.MeshPhongMaterial({ color: bodyColor })
+    );
+    nose.rotation.z = -Math.PI / 2;
+    nose.position.set(2.7, 0, 0);
+    airplaneGroup.add(nose);
+    
+    // Asas principais
+    const mainWing = new THREE.Mesh(
+        new THREE.BoxGeometry(3, 0.1, 5),
+        new THREE.MeshPhongMaterial({ color: wingColor })
+    );
+    mainWing.position.set(0, 0, 0);
+    airplaneGroup.add(mainWing);
+    
+    // Asas traseiras (estabilizadores horizontais)
+    const tailWing = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 0.1, 1.5),
+        new THREE.MeshPhongMaterial({ color: wingColor })
+    );
+    tailWing.position.set(-1.8, 0, 0);
+    airplaneGroup.add(tailWing);
+    
+    // Estabilizador vertical
+    const tailFin = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 0.8, 0.1),
+        new THREE.MeshPhongMaterial({ color: wingColor })
+    );
+    tailFin.position.set(-1.8, 0.4, 0);
+    airplaneGroup.add(tailFin);
+    
+    // Hélice
+    const propellerHub = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.15, 0.15, 0.3, 8),
+        new THREE.MeshPhongMaterial({ color: detailColor })
+    );
+    propellerHub.position.set(3.2, 0, 0);
+    propellerHub.rotation.z = Math.PI / 2;
+    airplaneGroup.add(propellerHub);
+    
+    // Pás da hélice
+    const propellerBlade1 = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, 1.5, 0.2),
+        new THREE.MeshPhongMaterial({ color: propellerColor })
+    );
+    propellerBlade1.position.set(3.35, 0, 0);
+    airplaneGroup.add(propellerBlade1);
+    
+    const propellerBlade2 = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, 0.2, 1.5),
+        new THREE.MeshPhongMaterial({ color: propellerColor })
+    );
+    propellerBlade2.position.set(3.35, 0, 0);
+    airplaneGroup.add(propellerBlade2);
+    
+    // Janelas da cabine
+    const cockpitWindow = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.35, 0.35, 0.8, 8),
+        new THREE.MeshPhongMaterial({ 
+            color: 0x88ccff, 
+            transparent: true,
+            opacity: 0.7
+        })
+    );
+    cockpitWindow.position.set(1.5, 0.2, 0);
+    cockpitWindow.rotation.z = Math.PI / 2;
+    airplaneGroup.add(cockpitWindow);
+    
+    // Adiciona sombras
+    airplaneGroup.traverse((object) => {
+        if (object.isMesh) {
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+    });
+    
+    airplaneGroup.scale.set(1.2, 1.2, 1.2);
+    airplaneGroup.position.set(-AIRPLANE_TURN_POINT, AIRPLANE_HEIGHT, -40);
+    
+    
+    return airplaneGroup;
+}
+
+// Inicializa o avião
+function initializeAirplane() {
+    airplane = createSimpleAirplane();
+    scene.add(airplane);
+}
+
+// Atualiza o movimento do avião
+function updateAirplane(deltaTime) {
+    if (!airplane) return;
+
+    // Movimento lateral
+    airplane.position.x += AIRPLANE_SPEED * airplaneDirection * deltaTime * 60;
+
+    // Rotação da hélice
+    if (airplane.children.length > 6) {
+        airplane.children[6].rotation.x += 0.2 * deltaTime * 60; // Pá 1
+        airplane.children[7].rotation.z += 0.2 * deltaTime * 60; // Pá 2
+    }
+
+    // Verifica se precisa inverter a direção
+    if (airplaneDirection > 0 && airplane.position.x > AIRPLANE_TURN_POINT) {
+        airplaneDirection = -1;
+        airplane.rotation.y = Math.PI; // gira 180 graus
+    } else if (airplaneDirection < 0 && airplane.position.x < -AIRPLANE_TURN_POINT) {
+        airplaneDirection = 1;
+        airplane.rotation.y = 0; // volta à rotação original
+    }
+
+    // Pequena oscilação vertical para parecer mais realista
+    const time = Date.now() * 0.001;
+    airplane.position.y = AIRPLANE_HEIGHT + Math.sin(time * 0.5) * 0.5;
+}
+
 
 // ===== PLAYER CAR MODELS =====
 // Array to store all car models
@@ -574,8 +732,17 @@ function createGreenSportsCar() {
         new THREE.BoxGeometry(2.2, 0.15, 2.4),
         new THREE.MeshPhongMaterial({ color: detailColor })
     );
-    roofRack.position.set(0, 2.35, 0);
+    roofRack.position.set(0, 2.45, 0);
     carGroup.add(roofRack);
+
+    // Aerofólio traseiro ligeiramente inclinado
+    const spoiler = new THREE.Mesh(
+        new THREE.BoxGeometry(2.4, 0.1, 0.5),
+        new THREE.MeshPhongMaterial({ color: detailColor })
+    );
+    spoiler.position.set(0, 1.4, -2.8);
+    spoiler.rotation.x = Math.PI * 0.10;
+    carGroup.add(spoiler);
 
     // Vidros dianteiro e traseiro
     const frontWindow = new THREE.Mesh(
@@ -1028,6 +1195,10 @@ hideGameOver();
 // Botão de reiniciar
 restartButton.addEventListener('click', () => {
     // Resetar variáveis do jogo
+    collisionMusic.pause();
+    collisionMusic.currentTime = 0;
+    bgMusic.currentTime = 0;
+    if (!isMuted) bgMusic.play();
     gameOver = false;
     collisionAnimating = false;
     collisionTime = 0;
@@ -1170,6 +1341,8 @@ function animate(currentTime = 0) {
         return; // Interrompe o restante da função quando gameOver é true
     }
 
+    updateAirplane(clampedDelta);
+
     // CORRIGIDO: Resto da função de animação continua normalmente...
     
     // Aumento de velocidade com base na pontuação
@@ -1252,6 +1425,11 @@ function animate(currentTime = 0) {
                 gameOver = true;
                 collisionAnimating = true;
                 finalScoreElement.innerHTML = `Score: ${score}`;
+                // Pare a música de fundo e toque a de colisão
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+                collisionMusic.currentTime = 0;
+                collisionMusic.play();
                 return;
             }
         }
@@ -1852,6 +2030,8 @@ function startGame() {
     car.rotation.y = Math.PI;
     scene.add(car);
 
+    initializeAirplane();
+
     startScreen.style.opacity = '0';
     setTimeout(() => {
         startScreen.style.display = 'none';
@@ -1859,6 +2039,8 @@ function startGame() {
         controlsPanel.style.display = '';
         scoreElement.style.display = '';
         pauseButton.style.display = '';
+        muteButton.style.display = '';
+        bgMusic.play();
         animate();
     }, 700);
 }
@@ -2056,4 +2238,36 @@ document.addEventListener('keydown', (e) => {
         hidePauseMenu();
         animate(performance.now());
     }
+});
+
+// ===== BOTÃO DE MUTE/DESMUTE DA MÚSICA =====
+const muteButton = document.createElement('button');
+muteButton.innerHTML = '🔊';
+muteButton.title = 'Mutar música';
+muteButton.style.position = 'absolute';
+muteButton.style.left = '20px';
+muteButton.style.bottom = '20px';
+muteButton.style.zIndex = '3000';
+muteButton.style.fontSize = '28px';
+muteButton.style.background = 'rgba(30,30,50,0.85)';
+muteButton.style.color = '#FFD700';
+muteButton.style.border = 'none';
+muteButton.style.borderRadius = '50%';
+muteButton.style.width = '48px';
+muteButton.style.height = '48px';
+muteButton.style.cursor = 'pointer';
+muteButton.style.boxShadow = '0 4px 16px 0 rgba(0,0,0,0.25)';
+muteButton.style.transition = 'background 0.2s, transform 0.1s';
+muteButton.style.display = 'none';
+muteButton.onmouseenter = () => muteButton.style.background = '#FFD700';
+muteButton.onmouseleave = () => muteButton.style.background = 'rgba(30,30,50,0.85)';
+document.body.appendChild(muteButton);
+
+let isMuted = false;
+muteButton.addEventListener('click', () => {
+    isMuted = !isMuted;
+    bgMusic.muted = isMuted;
+    collisionMusic.muted = isMuted;
+    muteButton.innerHTML = isMuted ? '🔇' : '🔊';
+    muteButton.title = isMuted ? 'Desmutar música' : 'Mutar música';
 });
