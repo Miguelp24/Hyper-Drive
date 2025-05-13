@@ -380,524 +380,424 @@ function createBlueSportsCar() {
     return carGroup;
 }
 
-// Add after the createBlueSportsCar function
-
-// Red sports car
 function createRedSportsCar() {
     const carGroup = new THREE.Group();
 
-    // Definição das cores do carro
-    const carBodyColor = 0xcc0000; // Vermelho escuro
-    const carRoofColor = 0xff6666; // Vermelho claro
-    const wheelColor = 0x222222; // Preto
-    const windowColor = 0xffcccc; // Rosa claro para vidros
-    const detailColor = 0xdddddd; // Cinza claro para detalhes
-    const lightColor = 0xffffcc; // Amarelo claro para faróis
+    // Cores principais
+    const carBodyColor = 0xd90429; // Vermelho vibrante
+    const carRoofColor = 0x8d0801; // Vermelho escuro
+    const windowColor = 0xffeaea;  // Vidro levemente rosado
+    const wheelColor = 0x222222;
+    const rimColor = 0xffffff;
+    const detailColor = 0x6a040f; // Detalhes escuros
+    const lightColor = 0xfff3c9;
 
-    // Corpo principal do carro
+    // Corpo principal
     const carBody = new THREE.Mesh(
-        new THREE.BoxGeometry(2.6, 0.7, 5.2),
-        new THREE.MeshPhongMaterial({ color: carBodyColor, shininess: 70 })
+        new THREE.BoxGeometry(2.9, 0.55, 5.2),
+        new THREE.MeshPhongMaterial({ color: carBodyColor, shininess: 120 })
     );
     carBody.position.y = 0.6;
     carBody.castShadow = true;
     carGroup.add(carBody);
 
-    // Teto/Cabine
+    // Teto rebaixado e mais esportivo
     const carRoof = new THREE.Mesh(
-        new THREE.BoxGeometry(2.3, 0.9, 2.6),
-        new THREE.MeshPhongMaterial({ color: carRoofColor, shininess: 60 })
+        new THREE.BoxGeometry(1.7, 0.38, 2.1),
+        new THREE.MeshPhongMaterial({ color: carRoofColor, shininess: 80 })
     );
-    carRoof.position.set(0, 1.4, 0);
+    carRoof.position.set(0, 1.05, 0.3);
     carRoof.castShadow = true;
     carGroup.add(carRoof);
 
-    // Vidro frontal (pequena inclinação)
-    const frontWindow = new THREE.Mesh(
-        new THREE.BoxGeometry(2.2, 0.8, 0.1),
-        new THREE.MeshPhongMaterial({ 
-            color: windowColor, 
-            transparent: true, 
-            opacity: 0.7,
-            shininess: 100 
-        })
+    // Aerofólio traseiro
+    const spoiler = new THREE.Mesh(
+        new THREE.BoxGeometry(1.6, 0.08, 0.5),
+        new THREE.MeshPhongMaterial({ color: detailColor })
     );
-    frontWindow.position.set(0, 1.35, 1.3);
-    frontWindow.rotation.x = Math.PI * 0.07;
-    carGroup.add(frontWindow);
+    spoiler.position.set(0, 1.05, -2.5);
+    carGroup.add(spoiler);
 
-    // Vidro traseiro (pequena inclinação)
-    const backWindow = new THREE.Mesh(
-        new THREE.BoxGeometry(2.2, 0.8, 0.1),
-        new THREE.MeshPhongMaterial({ 
-            color: windowColor, 
-            transparent: true, 
-            opacity: 0.7,
-            shininess: 100 
-        })
+    // Vidro dianteiro inclinado (apenas uma peça, inclinação correta)
+    const windshield = new THREE.Mesh(
+        new THREE.BoxGeometry(1.5, 0.32, 0.32),
+        new THREE.MeshPhongMaterial({ color: windowColor, transparent: true, opacity: 0.55 })
     );
-    backWindow.position.set(0, 1.35, -1.3);
-    backWindow.rotation.x = -Math.PI * 0.07;
-    carGroup.add(backWindow);
+    windshield.position.set(0, 1, 1.2);
+    carGroup.add(windshield);
 
-    // Vidros laterais
-    const sideWindowGeometry = new THREE.BoxGeometry(0.1, 0.65, 2.3);
-    const sideWindowMaterial = new THREE.MeshPhongMaterial({ 
-        color: windowColor, 
-        transparent: true, 
-        opacity: 0.7,
-        shininess: 100 
-    });
+    // Vidro traseiro inclinado (apenas uma peça, inclinação correta)
+    const rearWindow = new THREE.Mesh(
+        new THREE.BoxGeometry(1.2, 0.32, 0.32),
+        new THREE.MeshPhongMaterial({ color: windowColor, transparent: true, opacity: 0.55 })
+    );
+    rearWindow.position.set(0, 1, -0.7); 
+    carGroup.add(rearWindow);
 
-    const leftWindow = new THREE.Mesh(sideWindowGeometry, sideWindowMaterial);
-    leftWindow.position.set(1.25, 1.3, 0);
-    carGroup.add(leftWindow);
-
-    const rightWindow = new THREE.Mesh(sideWindowGeometry, sideWindowMaterial);
-    rightWindow.position.set(-1.25, 1.3, 0);
-    carGroup.add(rightWindow);
-
-    // Rodas (usando cilindros)
-    const wheelGeometry = new THREE.CylinderGeometry(0.52, 0.52, 0.39, 16);
-    const wheelMaterial = new THREE.MeshPhongMaterial({ color: wheelColor, shininess: 30 });
+    // Rodas esportivas 
+    const wheelGeometry = new THREE.CylinderGeometry(0.62, 0.62, 0.22, 24);
+    const rimGeometry = new THREE.TorusGeometry(0.42, 0.07, 8, 16);
     const wheelPositions = [
-        {x: -1.17, y: 0.52, z: 1.7},  // Frente-esquerda
-        {x: 1.17, y: 0.52, z: 1.7},   // Frente-direita
-        {x: -1.17, y: 0.52, z: -1.7}, // Traseira-esquerda
-        {x: 1.17, y: 0.52, z: -1.7}   // Traseira-direita
+        {x: -1.25, y: 0.48, z: 1.7}, 
+        {x: 1.25, y: 0.48, z: 1.7}, 
+        {x: -1.25, y: 0.48, z: -1.7}, 
+        {x: 1.25, y: 0.48, z: -1.7}
     ];
-
     wheelPositions.forEach(pos => {
-        const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+        const wheel = new THREE.Mesh(wheelGeometry, new THREE.MeshPhongMaterial({ color: wheelColor }));
         wheel.position.set(pos.x, pos.y, pos.z);
-        wheel.rotation.z = Math.PI / 2; // Roda na orientação correta
-        wheel.castShadow = true;
+        wheel.rotation.z = Math.PI / 2;
         carGroup.add(wheel);
     });
 
-    // Para-choques
+    // Para-choque dianteiro com entrada de ar
     const frontBumper = new THREE.Mesh(
-        new THREE.BoxGeometry(2.7, 0.39, 0.39),
-        new THREE.MeshPhongMaterial({ color: detailColor, shininess: 80 })
+        new THREE.BoxGeometry(2.9, 0.18, 0.45),
+        new THREE.MeshPhongMaterial({ color: detailColor, shininess: 90 })
     );
-    frontBumper.position.set(0, 0.52, 2.6);
-    frontBumper.castShadow = true;
+    frontBumper.position.set(0, 0.45, 2.7);
     carGroup.add(frontBumper);
 
-    const backBumper = new THREE.Mesh(
-        new THREE.BoxGeometry(2.7, 0.39, 0.39),
-        new THREE.MeshPhongMaterial({ color: detailColor, shininess: 80 })
+    const airIntake = new THREE.Mesh(
+        new THREE.BoxGeometry(1.2, 0.09, 0.18),
+        new THREE.MeshPhongMaterial({ color: 0x222222 })
     );
-    backBumper.position.set(0, 0.52, -2.6);
-    backBumper.castShadow = true;
-    carGroup.add(backBumper);
+    airIntake.position.set(0, 0.41, 2.85);
+    carGroup.add(airIntake);
 
-    // Faróis e lanternas
-    const headlightGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-    const headlightMaterial = new THREE.MeshPhongMaterial({ 
-        color: lightColor, 
-        emissive: lightColor,
-        emissiveIntensity: 0.5,
-        shininess: 100 
-    });
+    // Para-choque traseiro
+    const rearBumper = new THREE.Mesh(
+        new THREE.BoxGeometry(2.9, 0.18, 0.32),
+        new THREE.MeshPhongMaterial({ color: detailColor, shininess: 90 })
+    );
+    rearBumper.position.set(0, 0.45, -2.7);
+    carGroup.add(rearBumper);
 
+    // Faróis dianteiros alongados
+    const headlightGeometry = new THREE.BoxGeometry(0.32, 0.13, 0.18);
+    const headlightMaterial = new THREE.MeshPhongMaterial({ color: lightColor, emissive: lightColor, emissiveIntensity: 0.8 });
     const leftHeadlight = new THREE.Mesh(headlightGeometry, headlightMaterial);
-    leftHeadlight.position.set(0.78, 0.78, 2.67);
-    leftHeadlight.scale.set(1.3, 1.3, 0.4);
+    leftHeadlight.position.set(0.55, 0.68, 2.85);
     carGroup.add(leftHeadlight);
-
     const rightHeadlight = new THREE.Mesh(headlightGeometry, headlightMaterial);
-    rightHeadlight.position.set(-0.78, 0.78, 2.67);
-    rightHeadlight.scale.set(1.3, 1.3, 0.4);
+    rightHeadlight.position.set(-0.55, 0.68, 2.85);
     carGroup.add(rightHeadlight);
 
-    const tailLightGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-    const tailLightMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0xff0000, 
-        emissive: 0xff0000,
-        emissiveIntensity: 0.5,
-        shininess: 100 
-    });
-
+    // Lanternas traseiras horizontais
+    const tailLightGeometry = new THREE.BoxGeometry(0.7, 0.13, 0.12);
+    const tailLightMaterial = new THREE.MeshPhongMaterial({ color: 0xff2222, emissive: 0xff2222, emissiveIntensity: 0.7 });
     const leftTailLight = new THREE.Mesh(tailLightGeometry, tailLightMaterial);
-    leftTailLight.position.set(0.78, 0.78, -2.67);
-    leftTailLight.scale.set(1.3, 1.3, 0.4);
+    leftTailLight.position.set(0.45, 0.7, -2.85);
     carGroup.add(leftTailLight);
-
     const rightTailLight = new THREE.Mesh(tailLightGeometry, tailLightMaterial);
-    rightTailLight.position.set(-0.78, 0.78, -2.67);
-    rightTailLight.scale.set(1.3, 1.3, 0.4);
+    rightTailLight.position.set(-0.45, 0.7, -2.85);
     carGroup.add(rightTailLight);
 
-    // Rack no teto
-    const roofRack = new THREE.Mesh(
-        new THREE.BoxGeometry(1.8, 0.13, 1.95),
-        new THREE.MeshPhongMaterial({ color: 0x444444 })
+    // Faixa esportiva central preta
+    const centerStripe = new THREE.Mesh(
+        new THREE.BoxGeometry(0.32, 0.04, 5.2),
+        new THREE.MeshPhongMaterial({ color: 0x111111 })
     );
-    roofRack.position.set(0, 1.95, 0);
-    carGroup.add(roofRack);
+    centerStripe.position.set(0, 0.83, 0);
+    carGroup.add(centerStripe);
 
-    // Placa 
+    // Detalhe esportivo no capô (vermelho escuro)
+    const hoodDetail = new THREE.Mesh(
+        new THREE.BoxGeometry(1.1, 0.04, 0.7),
+        new THREE.MeshPhongMaterial({ color: 0x6a040f })
+    );
+    hoodDetail.position.set(0, 0.82, 1.7);
+    carGroup.add(hoodDetail);
+
+    // Placa dianteira
     const licensePlate = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.8, 0.3),
+        new THREE.PlaneGeometry(0.7, 0.22),
         new THREE.MeshPhongMaterial({ 
             color: 0xffffff,
-            emissive: 0xdddddd,
+            emissive: 0xffcccc,
             emissiveIntensity: 0.1
         })
     );
-    licensePlate.position.set(0, 0.6, -2.05);
+    licensePlate.position.set(0, 0.55, -2.05);
     licensePlate.rotation.y = Math.PI;
     carGroup.add(licensePlate);
 
+    // Espelhos retrovisores
+    const mirrorGeometry = new THREE.BoxGeometry(0.18, 0.08, 0.08);
+    const mirrorMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc });
+    const leftMirror = new THREE.Mesh(mirrorGeometry, mirrorMaterial);
+    leftMirror.position.set(1.05, 1.12, 0.7);
+    leftMirror.rotation.y = Math.PI * 0.12;
+    carGroup.add(leftMirror);
+    const rightMirror = new THREE.Mesh(mirrorGeometry, mirrorMaterial);
+    rightMirror.position.set(-1.05, 1.12, 0.7);
+    rightMirror.rotation.y = -Math.PI * 0.12;
+    carGroup.add(rightMirror);
+
     carGroup.rotation.y = Math.PI; // Gira o carro 180 graus
-    
+
     return carGroup;
 }
 
+//createGreenSportsCar
 // Green sports car
 function createGreenSportsCar() {
     const carGroup = new THREE.Group();
 
-    // Definição das cores do carro
-    const carBodyColor = 0x006633; // Verde escuro
-    const carRoofColor = 0x33cc99; // Verde claro
-    const wheelColor = 0x222222; // Preto
-    const windowColor = 0xccffcc; // Verde claro para vidros
-    const detailColor = 0xdddddd; // Cinza claro para detalhes
-    const lightColor = 0xffffcc; // Amarelo claro para faróis
+    const carBodyColor = 0x1b5e20; 
+    const carRoofColor = 0x388e3c;
+    const windowColor = 0xeedddd;
+    const wheelColor = 0x000000;
+    const detailColor = 0x333333;
+    const lightColor = 0xffffcc;
 
-    // Corpo principal do carro
+    // Corpo principal
     const carBody = new THREE.Mesh(
-        new THREE.BoxGeometry(2.6, 0.7, 5.2),
-        new THREE.MeshPhongMaterial({ color: carBodyColor, shininess: 70 })
+        new THREE.BoxGeometry(3.2, 1.1, 5.8),
+        new THREE.MeshPhongMaterial({ color: carBodyColor })
     );
-    carBody.position.y = 0.6;
+    carBody.position.y = 0.8;
     carBody.castShadow = true;
     carGroup.add(carBody);
 
-    // Teto/Cabine
+    // Teto
     const carRoof = new THREE.Mesh(
-        new THREE.BoxGeometry(2.3, 0.9, 2.6),
-        new THREE.MeshPhongMaterial({ color: carRoofColor, shininess: 60 })
+        new THREE.BoxGeometry(2.6, 1.0, 2.4),
+        new THREE.MeshPhongMaterial({ color: carRoofColor })
     );
-    carRoof.position.set(0, 1.4, 0);
+    carRoof.position.set(0, 1.8, 0);
     carRoof.castShadow = true;
     carGroup.add(carRoof);
 
-    // Vidro frontal (pequena inclinação)
-    const frontWindow = new THREE.Mesh(
-        new THREE.BoxGeometry(2.2, 0.8, 0.1),
-        new THREE.MeshPhongMaterial({ 
-            color: windowColor, 
-            transparent: true, 
-            opacity: 0.7,
-            shininess: 100 
-        })
+    // Rack no teto
+    const roofRack = new THREE.Mesh(
+        new THREE.BoxGeometry(2.2, 0.15, 2.4),
+        new THREE.MeshPhongMaterial({ color: detailColor })
     );
-    frontWindow.position.set(0, 1.35, 1.3);
-    frontWindow.rotation.x = Math.PI * 0.07;
+    roofRack.position.set(0, 2.35, 0);
+    carGroup.add(roofRack);
+
+    // Vidros dianteiro e traseiro
+    const frontWindow = new THREE.Mesh(
+        new THREE.BoxGeometry(2.2, 0.7, 0.1),
+        new THREE.MeshPhongMaterial({ color: windowColor, transparent: true, opacity: 0.5 })
+    );
+    frontWindow.position.set(0, 1.7, 1.1);
+    frontWindow.rotation.x = Math.PI * 0.08;
     carGroup.add(frontWindow);
 
-    // Vidro traseiro (pequena inclinação)
     const backWindow = new THREE.Mesh(
-        new THREE.BoxGeometry(2.2, 0.8, 0.1),
-        new THREE.MeshPhongMaterial({ 
-            color: windowColor, 
-            transparent: true, 
-            opacity: 0.7,
-            shininess: 100 
-        })
+        new THREE.BoxGeometry(2.2, 0.7, 0.1),
+        new THREE.MeshPhongMaterial({ color: windowColor, transparent: true, opacity: 0.5 })
     );
-    backWindow.position.set(0, 1.35, -1.3);
-    backWindow.rotation.x = -Math.PI * 0.07;
+    backWindow.position.set(0, 1.7, -1.1);
+    backWindow.rotation.x = -Math.PI * 0.08;
     carGroup.add(backWindow);
 
     // Vidros laterais
-    const sideWindowGeometry = new THREE.BoxGeometry(0.1, 0.65, 2.3);
-    const sideWindowMaterial = new THREE.MeshPhongMaterial({ 
-        color: windowColor, 
-        transparent: true, 
-        opacity: 0.7,
-        shininess: 100 
-    });
-
+    const sideWindowGeometry = new THREE.BoxGeometry(0.1, 0.7, 2.0);
+    const sideWindowMaterial = new THREE.MeshPhongMaterial({ color: windowColor, transparent: true, opacity: 0.4 });
     const leftWindow = new THREE.Mesh(sideWindowGeometry, sideWindowMaterial);
-    leftWindow.position.set(1.25, 1.3, 0);
+    leftWindow.position.set(1.35, 1.7, 0);
     carGroup.add(leftWindow);
-
     const rightWindow = new THREE.Mesh(sideWindowGeometry, sideWindowMaterial);
-    rightWindow.position.set(-1.25, 1.3, 0);
+    rightWindow.position.set(-1.35, 1.7, 0);
     carGroup.add(rightWindow);
 
-    // Rodas (usando cilindros)
-    const wheelGeometry = new THREE.CylinderGeometry(0.52, 0.52, 0.39, 16);
-    const wheelMaterial = new THREE.MeshPhongMaterial({ color: wheelColor, shininess: 30 });
+    // Pneus grossos
+    const wheelGeometry = new THREE.CylinderGeometry(0.7, 0.7, 0.5, 12);
+    const wheelMaterial = new THREE.MeshPhongMaterial({ color: wheelColor });
     const wheelPositions = [
-        {x: -1.17, y: 0.52, z: 1.7},  // Frente-esquerda
-        {x: 1.17, y: 0.52, z: 1.7},   // Frente-direita
-        {x: -1.17, y: 0.52, z: -1.7}, // Traseira-esquerda
-        {x: 1.17, y: 0.52, z: -1.7}   // Traseira-direita
+        {x: -1.4, y: 0.6, z: 2.2},
+        {x: 1.4, y: 0.6, z: 2.2},
+        {x: -1.4, y: 0.6, z: -2.2},
+        {x: 1.4, y: 0.6, z: -2.2}
     ];
-
     wheelPositions.forEach(pos => {
         const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
         wheel.position.set(pos.x, pos.y, pos.z);
-        wheel.rotation.z = Math.PI / 2; // Roda na orientação correta
-        wheel.castShadow = true;
+        wheel.rotation.z = Math.PI / 2;
         carGroup.add(wheel);
     });
 
     // Para-choques
     const frontBumper = new THREE.Mesh(
-        new THREE.BoxGeometry(2.7, 0.39, 0.39),
-        new THREE.MeshPhongMaterial({ color: detailColor, shininess: 80 })
+        new THREE.BoxGeometry(2.8, 0.2, 0.3),
+        new THREE.MeshPhongMaterial({ color: detailColor })
     );
-    frontBumper.position.set(0, 0.52, 2.6);
-    frontBumper.castShadow = true;
+    frontBumper.position.set(0, 0.6, 2.9);
     carGroup.add(frontBumper);
 
-    const backBumper = new THREE.Mesh(
-        new THREE.BoxGeometry(2.7, 0.39, 0.39),
-        new THREE.MeshPhongMaterial({ color: detailColor, shininess: 80 })
+    const rearBumper = new THREE.Mesh(
+        new THREE.BoxGeometry(2.8, 0.2, 0.3),
+        new THREE.MeshPhongMaterial({ color: detailColor })
     );
-    backBumper.position.set(0, 0.52, -2.6);
-    backBumper.castShadow = true;
-    carGroup.add(backBumper);
+    rearBumper.position.set(0, 0.6, -2.9);
+    carGroup.add(rearBumper);
 
-    // Faróis e lanternas
-    const headlightGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-    const headlightMaterial = new THREE.MeshPhongMaterial({ 
-        color: lightColor, 
-        emissive: lightColor,
-        emissiveIntensity: 0.5,
-        shininess: 100 
-    });
-
+    // Faróis
+    const headlightGeometry = new THREE.SphereGeometry(0.18, 12, 12);
+    const headlightMaterial = new THREE.MeshPhongMaterial({ color: lightColor, emissive: lightColor, emissiveIntensity: 0.5 });
     const leftHeadlight = new THREE.Mesh(headlightGeometry, headlightMaterial);
-    leftHeadlight.position.set(0.78, 0.78, 2.67);
-    leftHeadlight.scale.set(1.3, 1.3, 0.4);
+    leftHeadlight.position.set(0.7, 1.0, 2.95);
+    leftHeadlight.scale.set(1.1, 1.1, 0.5);
     carGroup.add(leftHeadlight);
-
     const rightHeadlight = new THREE.Mesh(headlightGeometry, headlightMaterial);
-    rightHeadlight.position.set(-0.78, 0.78, 2.67);
-    rightHeadlight.scale.set(1.3, 1.3, 0.4);
+    rightHeadlight.position.set(-0.7, 1.0, 2.95);
+    rightHeadlight.scale.set(1.1, 1.1, 0.5);
     carGroup.add(rightHeadlight);
 
-    const tailLightGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-    const tailLightMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0xff0000, 
-        emissive: 0xff0000,
-        emissiveIntensity: 0.5,
-        shininess: 100 
-    });
-
+    // Lanternas traseiras
+    const tailLightGeometry = new THREE.SphereGeometry(0.13, 10, 10);
+    const tailLightMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 0.5 });
     const leftTailLight = new THREE.Mesh(tailLightGeometry, tailLightMaterial);
-    leftTailLight.position.set(0.78, 0.78, -2.67);
-    leftTailLight.scale.set(1.3, 1.3, 0.4);
+    leftTailLight.position.set(0.7, 1.0, -2.95);
+    leftTailLight.scale.set(1.1, 1.1, 0.5);
     carGroup.add(leftTailLight);
-
     const rightTailLight = new THREE.Mesh(tailLightGeometry, tailLightMaterial);
-    rightTailLight.position.set(-0.78, 0.78, -2.67);
-    rightTailLight.scale.set(1.3, 1.3, 0.4);
+    rightTailLight.position.set(-0.7, 1.0, -2.95);
+    rightTailLight.scale.set(1.1, 1.1, 0.5);
     carGroup.add(rightTailLight);
 
-    // Rack no teto
-    const roofRack = new THREE.Mesh(
-        new THREE.BoxGeometry(1.8, 0.13, 1.95),
-        new THREE.MeshPhongMaterial({ color: 0x444444 })
+    // Detalhe lateral esportivo
+    const sideStripe = new THREE.Mesh(
+        new THREE.BoxGeometry(2.8, 0.07, 5.2),
+        new THREE.MeshPhongMaterial({ color: 0x22ff22 })
     );
-    roofRack.position.set(0, 1.95, 0);
-    carGroup.add(roofRack);
+    sideStripe.position.set(0, 0.45, 0);
+    carGroup.add(sideStripe);
 
-    // Placa 
-    const licensePlate = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.8, 0.3),
-        new THREE.MeshPhongMaterial({ 
-            color: 0xffffff,
-            emissive: 0xdddddd,
-            emissiveIntensity: 0.1
-        })
-    );
-    licensePlate.position.set(0, 0.6, -2.05);
-    licensePlate.rotation.y = Math.PI;
-    carGroup.add(licensePlate);
-
-    carGroup.rotation.y = Math.PI; // Gira o carro 180 graus
-    
     return carGroup;
 }
 
+//createYellowSportsCar
 // Yellow sports car
 function createYellowSportsCar() {
     const carGroup = new THREE.Group();
 
-    // Definição das cores do carro
-    const carBodyColor = 0xcc9900; // Amarelo dourado
-    const carRoofColor = 0xffcc33; // Amarelo claro
-    const wheelColor = 0x222222; // Preto
-    const windowColor = 0xffffcc; // Amarelo claro para vidros
-    const detailColor = 0x333333; // Cinza escuro para detalhes
-    const lightColor = 0xffffcc; // Amarelo claro para faróis
+    const carBodyColor = 0x111111; 
+    const carRoofColor = 0x333333;
+    const windowColor = 0xaaaaaa;
+    const wheelColor = 0x555555;
+    const detailColor = 0xff0000; 
+    const lightColor = 0xffffff;
 
-    // Corpo principal do carro
+    // Corpo principal
     const carBody = new THREE.Mesh(
-        new THREE.BoxGeometry(2.6, 0.7, 5.2),
-        new THREE.MeshPhongMaterial({ color: carBodyColor, shininess: 70 })
+        new THREE.BoxGeometry(3.0, 0.6, 6.0),
+        new THREE.MeshPhongMaterial({ color: carBodyColor })
     );
     carBody.position.y = 0.6;
     carBody.castShadow = true;
     carGroup.add(carBody);
 
-    // Teto/Cabine
+    // Teto
     const carRoof = new THREE.Mesh(
-        new THREE.BoxGeometry(2.3, 0.9, 2.6),
-        new THREE.MeshPhongMaterial({ color: carRoofColor, shininess: 60 })
+        new THREE.BoxGeometry(2.5, 0.5, 2.8),
+        new THREE.MeshPhongMaterial({ color: carRoofColor })
     );
-    carRoof.position.set(0, 1.4, 0);
+    carRoof.position.set(0, 1.2, 0.5);
     carRoof.castShadow = true;
     carGroup.add(carRoof);
 
-    // Vidro frontal (pequena inclinação)
-    const frontWindow = new THREE.Mesh(
-        new THREE.BoxGeometry(2.2, 0.8, 0.1),
-        new THREE.MeshPhongMaterial({ 
-            color: windowColor, 
-            transparent: true, 
-            opacity: 0.7,
-            shininess: 100 
-        })
+    // Faixa lateral vermelha
+    const sideStripe = new THREE.Mesh(
+        new THREE.BoxGeometry(2.8, 0.05, 5.8),
+        new THREE.MeshPhongMaterial({ color: detailColor })
     );
-    frontWindow.position.set(0, 1.35, 1.3);
-    frontWindow.rotation.x = Math.PI * 0.07;
+    sideStripe.position.set(0, 0.4, 0);
+    carGroup.add(sideStripe);
+
+    // Vidros dianteiro e traseiro
+    const frontWindow = new THREE.Mesh(
+        new THREE.BoxGeometry(2.3, 0.4, 0.1),
+        new THREE.MeshPhongMaterial({ color: windowColor, transparent: true, opacity: 0.5 })
+    );
+    frontWindow.position.set(0, 1.1, 1.1);
+    frontWindow.rotation.x = Math.PI * 0.08;
     carGroup.add(frontWindow);
 
-    // Vidro traseiro (pequena inclinação)
     const backWindow = new THREE.Mesh(
-        new THREE.BoxGeometry(2.2, 0.8, 0.1),
-        new THREE.MeshPhongMaterial({ 
-            color: windowColor, 
-            transparent: true, 
-            opacity: 0.7,
-            shininess: 100 
-        })
+        new THREE.BoxGeometry(2.3, 0.4, 0.1),
+        new THREE.MeshPhongMaterial({ color: windowColor, transparent: true, opacity: 0.5 })
     );
-    backWindow.position.set(0, 1.35, -1.3);
-    backWindow.rotation.x = -Math.PI * 0.07;
+    backWindow.position.set(0, 1.1, -0.7);
+    backWindow.rotation.x = -Math.PI * 0.08;
     carGroup.add(backWindow);
 
     // Vidros laterais
-    const sideWindowGeometry = new THREE.BoxGeometry(0.1, 0.65, 2.3);
-    const sideWindowMaterial = new THREE.MeshPhongMaterial({ 
-        color: windowColor, 
-        transparent: true, 
-        opacity: 0.7,
-        shininess: 100 
-    });
-
+    const sideWindowGeometry = new THREE.BoxGeometry(0.1, 0.35, 2.0);
+    const sideWindowMaterial = new THREE.MeshPhongMaterial({ color: windowColor, transparent: true, opacity: 0.4 });
     const leftWindow = new THREE.Mesh(sideWindowGeometry, sideWindowMaterial);
-    leftWindow.position.set(1.25, 1.3, 0);
+    leftWindow.position.set(1.25, 1.1, 0.2);
     carGroup.add(leftWindow);
-
     const rightWindow = new THREE.Mesh(sideWindowGeometry, sideWindowMaterial);
-    rightWindow.position.set(-1.25, 1.3, 0);
+    rightWindow.position.set(-1.25, 1.1, 0.2);
     carGroup.add(rightWindow);
 
-    // Rodas (usando cilindros)
-    const wheelGeometry = new THREE.CylinderGeometry(0.52, 0.52, 0.39, 16);
-    const wheelMaterial = new THREE.MeshPhongMaterial({ color: wheelColor, shininess: 30 });
+    // Rodas
+    const wheelGeometry = new THREE.CylinderGeometry(0.55, 0.55, 0.3, 18);
+    const wheelMaterial = new THREE.MeshPhongMaterial({ color: wheelColor });
     const wheelPositions = [
-        {x: -1.17, y: 0.52, z: 1.7},  // Frente-esquerda
-        {x: 1.17, y: 0.52, z: 1.7},   // Frente-direita
-        {x: -1.17, y: 0.52, z: -1.7}, // Traseira-esquerda
-        {x: 1.17, y: 0.52, z: -1.7}   // Traseira-direita
+        {x: -1.3, y: 0.55, z: 2.1}, 
+        {x: 1.3, y: 0.55, z: 2.1}, 
+        {x: -1.3, y: 0.55, z: -2.1}, 
+        {x: 1.3, y: 0.55, z: -2.1}
     ];
-
     wheelPositions.forEach(pos => {
         const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
         wheel.position.set(pos.x, pos.y, pos.z);
-        wheel.rotation.z = Math.PI / 2; // Roda na orientação correta
-        wheel.castShadow = true;
+        wheel.rotation.z = Math.PI / 2;
         carGroup.add(wheel);
     });
 
     // Para-choques
     const frontBumper = new THREE.Mesh(
-        new THREE.BoxGeometry(2.7, 0.39, 0.39),
-        new THREE.MeshPhongMaterial({ color: detailColor, shininess: 80 })
+        new THREE.BoxGeometry(2.9, 0.18, 0.32),
+        new THREE.MeshPhongMaterial({ color: detailColor })
     );
-    frontBumper.position.set(0, 0.52, 2.6);
-    frontBumper.castShadow = true;
+    frontBumper.position.set(0, 0.45, 2.95);
     carGroup.add(frontBumper);
 
-    const backBumper = new THREE.Mesh(
-        new THREE.BoxGeometry(2.7, 0.39, 0.39),
-        new THREE.MeshPhongMaterial({ color: detailColor, shininess: 80 })
+    const rearBumper = new THREE.Mesh(
+        new THREE.BoxGeometry(2.9, 0.18, 0.32),
+        new THREE.MeshPhongMaterial({ color: detailColor })
     );
-    backBumper.position.set(0, 0.52, -2.6);
-    backBumper.castShadow = true;
-    carGroup.add(backBumper);
+    rearBumper.position.set(0, 0.45, -2.95);
+    carGroup.add(rearBumper);
 
-    // Faróis e lanternas
-    const headlightGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-    const headlightMaterial = new THREE.MeshPhongMaterial({ 
-        color: lightColor, 
-        emissive: lightColor,
-        emissiveIntensity: 0.5,
-        shininess: 100 
-    });
-
+    // Faróis
+    const headlightGeometry = new THREE.SphereGeometry(0.16, 10, 10);
+    const headlightMaterial = new THREE.MeshPhongMaterial({ color: lightColor, emissive: lightColor, emissiveIntensity: 0.7 });
     const leftHeadlight = new THREE.Mesh(headlightGeometry, headlightMaterial);
-    leftHeadlight.position.set(0.78, 0.78, 2.67);
-    leftHeadlight.scale.set(1.3, 1.3, 0.4);
+    leftHeadlight.position.set(0.7, 0.7, 3.0);
+    leftHeadlight.scale.set(1.1, 1.1, 0.5);
     carGroup.add(leftHeadlight);
-
     const rightHeadlight = new THREE.Mesh(headlightGeometry, headlightMaterial);
-    rightHeadlight.position.set(-0.78, 0.78, 2.67);
-    rightHeadlight.scale.set(1.3, 1.3, 0.4);
+    rightHeadlight.position.set(-0.7, 0.7, 3.0);
+    rightHeadlight.scale.set(1.1, 1.1, 0.5);
     carGroup.add(rightHeadlight);
 
-    const tailLightGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-    const tailLightMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0xff0000, 
-        emissive: 0xff0000,
-        emissiveIntensity: 0.5,
-        shininess: 100 
-    });
-
+    // Lanternas traseiras
+    const tailLightGeometry = new THREE.SphereGeometry(0.13, 10, 10);
+    const tailLightMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 0.5 });
     const leftTailLight = new THREE.Mesh(tailLightGeometry, tailLightMaterial);
-    leftTailLight.position.set(0.78, 0.78, -2.67);
-    leftTailLight.scale.set(1.3, 1.3, 0.4);
+    leftTailLight.position.set(0.7, 0.7, -3.0);
+    leftTailLight.scale.set(1.1, 1.1, 0.5);
     carGroup.add(leftTailLight);
-
     const rightTailLight = new THREE.Mesh(tailLightGeometry, tailLightMaterial);
-    rightTailLight.position.set(-0.78, 0.78, -2.67);
-    rightTailLight.scale.set(1.3, 1.3, 0.4);
+    rightTailLight.position.set(-0.7, 0.7, -3.0);
+    rightTailLight.scale.set(1.1, 1.1, 0.5);
     carGroup.add(rightTailLight);
 
-    // Rack no teto
-    const roofRack = new THREE.Mesh(
-        new THREE.BoxGeometry(1.8, 0.13, 1.95),
-        new THREE.MeshPhongMaterial({ color: 0x444444 })
+    // Detalhe esportivo no capô
+    const hoodDetail = new THREE.Mesh(
+        new THREE.BoxGeometry(1.3, 0.04, 0.8),
+        new THREE.MeshPhongMaterial({ color: 0xffff00 })
     );
-    roofRack.position.set(0, 1.95, 0);
-    carGroup.add(roofRack);
+    hoodDetail.position.set(0, 0.8, 1.8);
+    carGroup.add(hoodDetail);
 
-    // Placa 
-    const licensePlate = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.8, 0.3),
-        new THREE.MeshPhongMaterial({ 
-            color: 0xffffff,
-            emissive: 0xdddddd,
-            emissiveIntensity: 0.1
-        })
-    );
-    licensePlate.position.set(0, 0.6, -2.05);
-    licensePlate.rotation.y = Math.PI;
-    carGroup.add(licensePlate);
-
-    carGroup.rotation.y = Math.PI; // Gira o carro 180 graus
-    
     return carGroup;
 }
 
@@ -906,20 +806,20 @@ function initializeCarModels() {
     carModels.push({
         name: "Blue Racer",
         createFunction: createBlueSportsCar,
-        description: "Clássico e veloz, com ótima aerodinâmica."
+        description: "Clássico e veloz"
     });
     carModels.push({
         name: "Red Thunder",
         createFunction: createRedSportsCar,
-        description: "Potente e agressivo, feito para vencer."
+        description: "Potente e agressivo, feito para vencer"
     });
     carModels.push({
         name: "Green Machine",
         createFunction: createGreenSportsCar,
-        description: "Ecoesportivo com alta estabilidade."
+        description: "SUV desportivo com alta estabilidade"
     });
     carModels.push({
-        name: "Yellow Bolt",
+        name: "Black Bolt",
         createFunction: createYellowSportsCar,
         description: "Leve e ágil, perfeito para desviar de obstáculos."
     });
@@ -1070,17 +970,38 @@ restartButton.style.marginTop = '10px';
 restartButton.style.padding = '16px 48px';
 restartButton.style.fontSize = '24px';
 restartButton.style.background = 'linear-gradient(90deg, #FF5500 0%, #FFB300 100%)';
-restartButton.style.color = 'white';
+restartButton.style.color = '#23243a';
 restartButton.style.border = 'none';
 restartButton.style.borderRadius = '8px';
 restartButton.style.cursor = 'pointer';
 restartButton.style.fontWeight = 'bold';
-restartButton.style.boxShadow = '0 2px 12px #0008';
+restartButton.style.boxShadow = 'none';
 restartButton.style.transition = 'transform 0.1s';
 restartButton.innerHTML = 'Restart';
 restartButton.onmouseenter = () => restartButton.style.transform = 'scale(1.07)';
 restartButton.onmouseleave = () => restartButton.style.transform = 'scale(1)';
 gameOverBox.appendChild(restartButton);
+
+const backToMenuButton = document.createElement('button');
+backToMenuButton.innerHTML = 'Voltar ao Menu';
+backToMenuButton.style.marginTop = '18px';
+backToMenuButton.style.padding = '16px 48px';
+backToMenuButton.style.fontSize = '24px';
+backToMenuButton.style.background = 'linear-gradient(90deg, #FFD700 0%, #FF5500 100%)';
+backToMenuButton.style.color = '#23243a';
+backToMenuButton.style.border = 'none';
+backToMenuButton.style.borderRadius = '8px';
+backToMenuButton.style.cursor = 'pointer';
+backToMenuButton.style.fontWeight = 'bold';
+backToMenuButton.style.boxShadow = 'none';
+backToMenuButton.style.transition = 'transform 0.1s';
+backToMenuButton.onmouseenter = () => backToMenuButton.style.transform = 'scale(1.07)';
+backToMenuButton.onmouseleave = () => backToMenuButton.style.transform = 'scale(1)';
+gameOverBox.appendChild(backToMenuButton);
+
+backToMenuButton.addEventListener('click', () => {
+    window.location.reload();
+});
 
 // Função para mostrar Game Over com fade-in
 function showGameOver() {
@@ -1711,14 +1632,14 @@ function animateCarPreview() {
     carPreviewRenderer.render(carPreviewScene, carPreviewCamera);
 }
 
-// ===== TELA INICIAL =====
+// ===== NOVA TELA INICIAL COM SELEÇÃO MAIS BONITA =====
 const startScreen = document.createElement('div');
 startScreen.style.position = 'absolute';
 startScreen.style.top = '0';
 startScreen.style.left = '0';
 startScreen.style.width = '100vw';
 startScreen.style.height = '100vh';
-startScreen.style.background = 'linear-gradient(120deg, #23243a 0%, #3a2c4a 100%)';
+startScreen.style.background = 'radial-gradient(ellipse at 60% 40%, #2b2d42 60%, #1a1a2e 100%)';
 startScreen.style.display = 'flex';
 startScreen.style.flexDirection = 'column';
 startScreen.style.alignItems = 'center';
@@ -1728,45 +1649,184 @@ startScreen.style.transition = 'opacity 0.7s';
 startScreen.style.opacity = '1';
 startScreen.style.overflow = 'auto';
 
+// Título estilizado
 const title = document.createElement('div');
 title.innerHTML = 'HYPER DRIVE';
 title.style.color = '#FFD700';
-title.style.fontSize = '64px';
+title.style.fontSize = '72px';
 title.style.fontWeight = 'bold';
-title.style.letterSpacing = '4px';
-title.style.textShadow = '0 4px 24px #000, 0 1px 0 #fff';
-title.style.marginBottom = '32px';
-title.style.marginTop = '40px';
+title.style.letterSpacing = '8px';
+title.style.textShadow = '0 8px 32px #000, 0 2px 0 #fff';
+title.style.marginBottom = '24px';
+title.style.marginTop = '48px';
+title.style.fontFamily = 'Orbitron, Arial, sans-serif';
 startScreen.appendChild(title);
 
+
+// Subtítulo
 const subtitle = document.createElement('div');
 subtitle.innerHTML = 'Desvie dos carros e faça a maior pontuação!';
 subtitle.style.color = '#fff';
-subtitle.style.fontSize = '22px';
+subtitle.style.fontSize = '26px';
 subtitle.style.marginBottom = '48px';
 subtitle.style.textAlign = 'center';
+subtitle.style.fontFamily = 'Montserrat, Arial, sans-serif';
+subtitle.style.textShadow = '0 2px 8px #000';
 startScreen.appendChild(subtitle);
 
-// Add car selection UI
-const carSelectionUI = createCarSelectionUI();
-startScreen.appendChild(carSelectionUI);
+// Car selection container
+const carSelectionContainer = document.createElement('div');
+carSelectionContainer.style.display = 'flex';
+carSelectionContainer.style.flexDirection = 'column';
+carSelectionContainer.style.alignItems = 'center';
+carSelectionContainer.style.marginBottom = '40px';
+carSelectionContainer.style.width = '100%';
+carSelectionContainer.style.maxWidth = '600px';
+carSelectionContainer.style.background = 'rgba(30,30,50,0.85)';
+carSelectionContainer.style.borderRadius = '18px';
+carSelectionContainer.style.boxShadow = '0 8px 32px 0 rgba(0,0,0,0.45)';
+carSelectionContainer.style.padding = '32px 24px 24px 24px';
+carSelectionContainer.style.backdropFilter = 'blur(2px)';
+startScreen.appendChild(carSelectionContainer);
 
+// Título da seleção
+const selectionTitle = document.createElement('div');
+selectionTitle.innerHTML = 'Escolha seu carro';
+selectionTitle.style.color = '#FFD700';
+selectionTitle.style.fontSize = '32px';
+selectionTitle.style.marginBottom = '18px';
+selectionTitle.style.fontWeight = 'bold';
+selectionTitle.style.letterSpacing = '2px';
+selectionTitle.style.fontFamily = 'Orbitron, Arial, sans-serif';
+carSelectionContainer.appendChild(selectionTitle);
+
+// Car display container (preview 3D)
+const carDisplayContainer = document.createElement('div');
+carDisplayContainer.style.position = 'relative';
+carDisplayContainer.style.width = '420px';
+carDisplayContainer.style.height = '240px';
+carDisplayContainer.style.marginBottom = '18px';
+carDisplayContainer.style.background = 'linear-gradient(120deg, #23243a 60%, #3a2c4a 100%)';
+carDisplayContainer.style.borderRadius = '16px';
+carDisplayContainer.style.padding = '10px';
+carDisplayContainer.style.boxShadow = '0 8px 32px 0 rgba(0,0,0,0.3)';
+carDisplayContainer.style.display = 'flex';
+carDisplayContainer.style.justifyContent = 'center';
+carDisplayContainer.style.alignItems = 'flex-end';
+carSelectionContainer.appendChild(carDisplayContainer);
+
+// Car preview renderer
+const carPreviewRendererDiv = document.createElement('div');
+carPreviewRendererDiv.id = 'car-preview';
+carPreviewRendererDiv.style.width = '100%';
+carPreviewRendererDiv.style.height = '100%';
+carPreviewRendererDiv.style.borderRadius = '12px';
+carPreviewRendererDiv.style.overflow = 'hidden';
+carDisplayContainer.appendChild(carPreviewRendererDiv);
+
+// Car info
+const carInfoContainer = document.createElement('div');
+carInfoContainer.style.display = 'flex';
+carInfoContainer.style.flexDirection = 'column';
+carInfoContainer.style.alignItems = 'center';
+carInfoContainer.style.marginBottom = '18px';
+carSelectionContainer.appendChild(carInfoContainer);
+
+const carName = document.createElement('div');
+carName.id = 'car-name';
+carName.style.color = '#FFD700';
+carName.style.fontSize = '26px';
+carName.style.fontWeight = 'bold';
+carName.style.marginBottom = '8px';
+carName.style.fontFamily = 'Orbitron, Arial, sans-serif';
+carInfoContainer.appendChild(carName);
+
+const carDescription = document.createElement('div');
+carDescription.id = 'car-description';
+carDescription.style.color = '#CCC';
+carDescription.style.fontSize = '17px';
+carDescription.style.textAlign = 'center';
+carDescription.style.maxWidth = '380px';
+carDescription.style.fontFamily = 'Montserrat, Arial, sans-serif';
+carInfoContainer.appendChild(carDescription);
+
+// Navegação dos carros
+const navButtonsContainer = document.createElement('div');
+navButtonsContainer.style.display = 'flex';
+navButtonsContainer.style.width = '100%';
+navButtonsContainer.style.justifyContent = 'space-between';
+navButtonsContainer.style.padding = '0 80px';
+carSelectionContainer.appendChild(navButtonsContainer);
+
+const prevButton = document.createElement('button');
+prevButton.innerHTML = '< Anterior';
+prevButton.style.padding = '12px 28px';
+prevButton.style.fontSize = '18px';
+prevButton.style.background = 'linear-gradient(90deg, #23243a 0%, #3a2c4a 100%)';
+prevButton.style.color = '#FFD700';
+prevButton.style.border = 'none';
+prevButton.style.borderRadius = '10px';
+prevButton.style.cursor = 'pointer';
+prevButton.style.fontWeight = 'bold';
+prevButton.style.transition = 'background 0.2s, color 0.2s';
+prevButton.onmouseenter = () => {
+    prevButton.style.background = '#FFD700';
+    prevButton.style.color = '#23243a';
+};
+prevButton.onmouseleave = () => {
+    prevButton.style.background = 'linear-gradient(90deg, #23243a 0%, #3a2c4a 100%)';
+    prevButton.style.color = '#FFD700';
+};
+navButtonsContainer.appendChild(prevButton);
+
+const nextButton = document.createElement('button');
+nextButton.innerHTML = 'Próximo >';
+nextButton.style.padding = '12px 28px';
+nextButton.style.fontSize = '18px';
+nextButton.style.background = 'linear-gradient(90deg, #23243a 0%, #3a2c4a 100%)';
+nextButton.style.color = '#FFD700';
+nextButton.style.border = 'none';
+nextButton.style.borderRadius = '10px';
+nextButton.style.cursor = 'pointer';
+nextButton.style.fontWeight = 'bold';
+nextButton.style.transition = 'background 0.2s, color 0.2s';
+nextButton.onmouseenter = () => {
+    nextButton.style.background = '#FFD700';
+    nextButton.style.color = '#23243a';
+};
+nextButton.onmouseleave = () => {
+    nextButton.style.background = 'linear-gradient(90deg, #23243a 0%, #3a2c4a 100%)';
+    nextButton.style.color = '#FFD700';
+};
+navButtonsContainer.appendChild(nextButton);
+
+// Eventos de navegação
+prevButton.addEventListener('click', () => {
+    selectedCarIndex = (selectedCarIndex - 1 + carModels.length) % carModels.length;
+    updateCarPreview();
+});
+nextButton.addEventListener('click', () => {
+    selectedCarIndex = (selectedCarIndex + 1) % carModels.length;
+    updateCarPreview();
+});
+
+// Botão de iniciar
 const startButton = document.createElement('button');
-startButton.innerHTML = 'Start Game';
-startButton.style.padding = '18px 60px';
-startButton.style.fontSize = '28px';
-startButton.style.background = 'linear-gradient(90deg, #FF5500 0%, #FFB300 100%)';
-startButton.style.color = 'white';
+startButton.innerHTML = 'Jogar';
+startButton.style.padding = '20px 80px';
+startButton.style.fontSize = '32px';
+startButton.style.background = 'linear-gradient(90deg, #FFD700 0%, #FF5500 100%)';
+startButton.style.color = '#23243a';
 startButton.style.border = 'none';
-startButton.style.borderRadius = '12px';
+startButton.style.borderRadius = '16px';
 startButton.style.cursor = 'pointer';
 startButton.style.fontWeight = 'bold';
-startButton.style.boxShadow = '0 2px 16px #0008';
+startButton.style.boxShadow = 'none';
 startButton.style.transition = 'transform 0.1s, background 0.3s';
-startButton.style.marginBottom = '40px';
+startButton.style.marginTop = '32px';
 startButton.onmouseenter = () => startButton.style.transform = 'scale(1.08)';
 startButton.onmouseleave = () => startButton.style.transform = 'scale(1)';
-startScreen.appendChild(startButton);
+carSelectionContainer.appendChild(startButton);
 
 document.body.appendChild(startScreen);
 
@@ -1775,32 +1835,31 @@ renderer.domElement.style.filter = 'blur(6px)';
 controlsPanel.style.display = 'none';
 scoreElement.style.display = 'none';
 
-// Initialize the car models and preview
+// Inicializa os modelos e preview
 initializeCarModels();
-
-// Wait for the page to fully load before initializing the car preview
 window.addEventListener('load', () => {
     initCarPreview();
     updateCarPreview();
 });
 
-// Update the startGame function to use selected car
-let car; // Declare car globally
+// Atualiza o startGame para usar o botão novo
+let car;
+startButton.addEventListener('click', startGame);
 
 function startGame() {
-    // Create the selected car model
     car = carModels[selectedCarIndex].createFunction();
     car.position.set(0, 0.1, 5);
     car.rotation.y = Math.PI;
     scene.add(car);
-    
+
     startScreen.style.opacity = '0';
     setTimeout(() => {
         startScreen.style.display = 'none';
         renderer.domElement.style.filter = '';
         controlsPanel.style.display = '';
         scoreElement.style.display = '';
-        animate(); // Inicia o loop de animação
+        pauseButton.style.display = '';
+        animate();
     }, 700);
 }
 
@@ -1810,3 +1869,191 @@ startButton.addEventListener('click', startGame);
 // Impede que o jogo inicie automaticamente
 // Remova ou comente a chamada direta a animate() no final do arquivo
 // animate();
+
+// ===== BOTÃO DE PAUSA E MENU DE PAUSA =====
+
+// Cria o botão de pausa
+const pauseButton = document.createElement('button');
+pauseButton.innerHTML = '⏸️';
+pauseButton.title = 'Pausar';
+pauseButton.style.position = 'absolute';
+pauseButton.style.top = 'unset';
+pauseButton.style.bottom = '20px';
+pauseButton.style.right = '20px';
+pauseButton.style.zIndex = '3000';
+pauseButton.style.fontSize = '32px';
+pauseButton.style.background = 'rgba(30,30,50,0.85)';
+pauseButton.style.color = '#FFD700';
+pauseButton.style.border = 'none';
+pauseButton.style.borderRadius = '50%';
+pauseButton.style.width = '56px';
+pauseButton.style.height = '56px';
+pauseButton.style.cursor = 'pointer';
+pauseButton.style.boxShadow = '0 4px 16px 0 rgba(0,0,0,0.25)';
+pauseButton.style.transition = 'background 0.2s, transform 0.1s';
+pauseButton.style.display = 'none';
+pauseButton.onmouseenter = () => pauseButton.style.background = '#FFD700';
+pauseButton.onmouseleave = () => pauseButton.style.background = 'rgba(30,30,50,0.85)';
+document.body.appendChild(pauseButton);
+
+// Cria o menu de pausa (inicialmente oculto)
+const pauseMenuContainer = document.createElement('div');
+pauseMenuContainer.style.position = 'absolute';
+pauseMenuContainer.style.top = '0';
+pauseMenuContainer.style.left = '0';
+pauseMenuContainer.style.width = '100vw';
+pauseMenuContainer.style.height = '100vh';
+pauseMenuContainer.style.display = 'flex';
+pauseMenuContainer.style.alignItems = 'center';
+pauseMenuContainer.style.justifyContent = 'center';
+pauseMenuContainer.style.background = 'rgba(0,0,0,0.65)';
+pauseMenuContainer.style.backdropFilter = 'blur(4px)';
+pauseMenuContainer.style.zIndex = '4000';
+pauseMenuContainer.style.transition = 'opacity 0.5s';
+pauseMenuContainer.style.opacity = '0';
+pauseMenuContainer.style.pointerEvents = 'none';
+document.body.appendChild(pauseMenuContainer);
+
+const pauseMenuBox = document.createElement('div');
+pauseMenuBox.style.background = 'rgba(30,30,40,0.95)';
+pauseMenuBox.style.borderRadius = '18px';
+pauseMenuBox.style.boxShadow = '0 8px 32px 0 rgba(0,0,0,0.45)';
+pauseMenuBox.style.padding = '48px 48px 32px 48px';
+pauseMenuBox.style.display = 'flex';
+pauseMenuBox.style.flexDirection = 'column';
+pauseMenuBox.style.alignItems = 'center';
+pauseMenuBox.style.animation = 'popIn 0.7s cubic-bezier(.68,-0.55,.27,1.55)';
+pauseMenuContainer.appendChild(pauseMenuBox);
+
+const pauseTitle = document.createElement('div');
+pauseTitle.innerHTML = 'PAUSED';
+pauseTitle.style.color = '#FFD700';
+pauseTitle.style.fontSize = '54px';
+pauseTitle.style.fontWeight = 'bold';
+pauseTitle.style.letterSpacing = '2px';
+pauseTitle.style.textShadow = '0 4px 24px #000, 0 1px 0 #fff';
+pauseTitle.style.marginBottom = '32px';
+pauseMenuBox.appendChild(pauseTitle);
+
+// Botão de reiniciar no menu de pausa
+const pauseRestartButton = document.createElement('button');
+pauseRestartButton.innerHTML = 'Reiniciar';
+pauseRestartButton.style.marginTop = '10px';
+pauseRestartButton.style.padding = '16px 48px';
+pauseRestartButton.style.fontSize = '24px';
+pauseRestartButton.style.background = 'linear-gradient(90deg, #FF5500 0%, #FFB300 100%)';
+pauseRestartButton.style.color = '#23243a';
+pauseRestartButton.style.border = 'none';
+pauseRestartButton.style.borderRadius = '8px';
+pauseRestartButton.style.cursor = 'pointer';
+pauseRestartButton.style.fontWeight = 'bold';
+pauseRestartButton.style.boxShadow = 'none';
+pauseRestartButton.style.transition = 'transform 0.1s';
+pauseRestartButton.onmouseenter = () => pauseRestartButton.style.transform = 'scale(1.07)';
+pauseRestartButton.onmouseleave = () => pauseRestartButton.style.transform = 'scale(1)';
+pauseMenuBox.appendChild(pauseRestartButton);
+
+// Botão de voltar ao menu inicial no menu de pausa
+const pauseBackToMenuButton = document.createElement('button');
+pauseBackToMenuButton.innerHTML = 'Voltar ao Menu';
+pauseBackToMenuButton.style.marginTop = '18px';
+pauseBackToMenuButton.style.padding = '16px 48px';
+pauseBackToMenuButton.style.fontSize = '24px';
+pauseBackToMenuButton.style.background = 'linear-gradient(90deg, #FFD700 0%, #FF5500 100%)';
+pauseBackToMenuButton.style.color = '#23243a';
+pauseBackToMenuButton.style.border = 'none';
+pauseBackToMenuButton.style.borderRadius = '8px';
+pauseBackToMenuButton.style.cursor = 'pointer';
+pauseBackToMenuButton.style.fontWeight = 'bold';
+pauseBackToMenuButton.style.boxShadow = 'none';
+pauseBackToMenuButton.style.transition = 'transform 0.1s';
+pauseBackToMenuButton.onmouseenter = () => pauseBackToMenuButton.style.transform = 'scale(1.07)';
+pauseBackToMenuButton.onmouseleave = () => pauseBackToMenuButton.style.transform = 'scale(1)';
+pauseMenuBox.appendChild(pauseBackToMenuButton);
+
+// texto PRECIONE ESC PARA SAIR DO PAUSE
+const pauseText = document.createElement('div');
+pauseText.style.marginTop = '24px';
+pauseText.innerHTML = 'Pressione ESC para sair do menu';
+pauseText.style.color = '#fff';
+pauseMenuBox.appendChild(pauseText);
+
+// Variável para controlar o estado de pausa
+let isPaused = false;
+
+// Funções para mostrar/ocultar o menu de pausa
+function showPauseMenu() {
+    pauseMenuContainer.style.opacity = '1';
+    pauseMenuContainer.style.pointerEvents = 'auto';
+    isPaused = true;
+}
+function hidePauseMenu() {
+    pauseMenuContainer.style.opacity = '0';
+    pauseMenuContainer.style.pointerEvents = 'none';
+    isPaused = false;
+}
+
+// Evento do botão de pausa
+pauseButton.addEventListener('click', () => {
+    if (!isPaused) {
+        showPauseMenu();
+    }
+});
+
+// Evento para reiniciar pelo menu de pausa
+pauseRestartButton.addEventListener('click', () => {
+    hidePauseMenu();
+    // Chama o mesmo código do botão de restart do game over
+    // (Você pode extrair para uma função se quiser evitar duplicação)
+    gameOver = false;
+    collisionAnimating = false;
+    collisionTime = 0;
+    score = 0;
+    gameSpeed = 1.0;
+    lastSpeedIncrease = 0;
+    distanceTraveled = 0;
+    scoreElement.innerHTML = `Score: ${score}`;
+    if (car) scene.remove(car);
+    car = carModels[selectedCarIndex].createFunction();
+    car.position.set(0, 0.1, 5);
+    car.rotation.set(0, Math.PI, 0);
+    scene.add(car);
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+        scene.remove(obstacles[i]);
+        obstacles.splice(i, 1);
+    }
+    leftRailGroup1.position.set(-10, 0, -170);
+    leftRailGroup2.position.set(-10, 0, -170 - railLength);
+    rightRailGroup1.position.set(10, 0, -170);
+    rightRailGroup2.position.set(10, 0, -170 - railLength);
+    leftRailGroup1.visible = true;
+    leftRailGroup2.visible = true;
+    rightRailGroup1.visible = true;
+    rightRailGroup2.visible = true;
+    roadTexture.offset.y = 0;
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    lastTime = performance.now();
+    animate(lastTime);
+});
+
+// Evento para voltar ao menu inicial pelo menu de pausa
+pauseBackToMenuButton.addEventListener('click', () => {
+    window.location.reload();
+});
+
+// Pausa o loop de animação quando o menu de pausa está aberto
+const originalAnimate = animate;
+function animateWrapper(currentTime = 0) {
+    if (isPaused) return; // Não anima se estiver pausado
+    originalAnimate(currentTime);
+}
+animate = animateWrapper;
+
+// Se você chama animate() em algum lugar, chame animate() normalmente.
+// Para permitir sair do pause, adicione um evento de teclado:
+document.addEventListener('keydown', (e) => {
+    if (isPaused && (e.key === 'Escape')) {
+        hidePauseMenu();
+        animate(performance.now());
+    }
+});
