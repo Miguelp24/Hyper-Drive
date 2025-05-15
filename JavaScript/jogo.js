@@ -365,12 +365,16 @@ function updateAirplane(deltaTime) {
 const carModels = [];
 let selectedCarIndex = 0; // Default car
 
+const carBodyTexture = new THREE.TextureLoader().load('assets/texture/texture_cars/azul.jpg'); 
+const carBodyTexture2 = new THREE.TextureLoader().load('assets/texture/texture_cars/vermelho.jpeg');
+const carBodyTexture3 = new THREE.TextureLoader().load('assets/texture/texture_cars/verde.jpg');
+const carBodyTexture4 = new THREE.TextureLoader().load('assets/texture/texture_cars/preto.jpg');
+
 // Original blue car (already in the code)
 function createBlueSportsCar() {
     const carGroup = new THREE.Group();
 
     // Definição das cores do carro
-    const carBodyColor = 0x0066cc; // Azul escuro
     const carRoofColor = 0x66aaff; // Azul clarinho
     const wheelColor = 0x222222; // Preto
     const windowColor = 0x99ccff; // Azul claro para vidros
@@ -379,8 +383,12 @@ function createBlueSportsCar() {
 
     // Corpo principal do carro
     const carBody = new THREE.Mesh(
-        new THREE.BoxGeometry(2.6, 0.7, 5.2),
-        new THREE.MeshPhongMaterial({ color: carBodyColor, shininess: 70 })
+    new THREE.BoxGeometry(2.6, 0.7, 5.2),
+    new THREE.MeshPhongMaterial({ 
+        map: carBodyTexture, // Aplica a textura
+        color: 0xffffff,     // Mantém as cores da textura
+        shininess: 70
+    })
     );
     carBody.position.y = 0.6;
     carBody.castShadow = true;
@@ -553,7 +561,11 @@ function createRedSportsCar() {
     // Corpo principal
     const carBody = new THREE.Mesh(
         new THREE.BoxGeometry(2.9, 0.55, 5.2),
-        new THREE.MeshPhongMaterial({ color: carBodyColor, shininess: 120 })
+        new THREE.MeshPhongMaterial({ 
+        map: carBodyTexture2, // Aplica a textura
+        color: 0xffffff,     // Mantém as cores da textura
+        shininess: 70
+    })
     );
     carBody.position.y = 0.6;
     carBody.castShadow = true;
@@ -702,7 +714,6 @@ function createRedSportsCar() {
 function createGreenSportsCar() {
     const carGroup = new THREE.Group();
 
-    const carBodyColor = 0x1b5e20; 
     const carRoofColor = 0x388e3c;
     const windowColor = 0xeedddd;
     const wheelColor = 0x000000;
@@ -712,7 +723,11 @@ function createGreenSportsCar() {
     // Corpo principal
     const carBody = new THREE.Mesh(
         new THREE.BoxGeometry(3.2, 1.1, 5.8),
-        new THREE.MeshPhongMaterial({ color: carBodyColor })
+        new THREE.MeshPhongMaterial({ 
+        map: carBodyTexture3, // Aplica a textura
+        color: 0xffffff,     // Mantém as cores da textura
+        shininess: 70
+    })
     );
     carBody.position.y = 0.8;
     carBody.castShadow = true;
@@ -842,7 +857,6 @@ function createGreenSportsCar() {
 function createYellowSportsCar() {
     const carGroup = new THREE.Group();
 
-    const carBodyColor = 0x111111; 
     const carRoofColor = 0x333333;
     const windowColor = 0xaaaaaa;
     const wheelColor = 0x555555;
@@ -852,7 +866,11 @@ function createYellowSportsCar() {
     // Corpo principal
     const carBody = new THREE.Mesh(
         new THREE.BoxGeometry(3.0, 0.6, 6.0),
-        new THREE.MeshPhongMaterial({ color: carBodyColor })
+        new THREE.MeshPhongMaterial({ 
+        map: carBodyTexture4, // Aplica a textura
+        color: 0xffffff,     // Mantém as cores da textura
+        shininess: 70
+    })
     );
     carBody.position.y = 0.6;
     carBody.castShadow = true;
@@ -1619,123 +1637,7 @@ railElements.push(rightMiddleRail2);
 
 // Add before the startScreen initialization
 
-// ===== CAR SELECTION PANEL =====
-function createCarSelectionUI() {
-    const carSelectionContainer = document.createElement('div');
-    carSelectionContainer.style.display = 'flex';
-    carSelectionContainer.style.flexDirection = 'column';
-    carSelectionContainer.style.alignItems = 'center';
-    carSelectionContainer.style.marginBottom = '40px';
-    carSelectionContainer.style.width = '100%';
-    
-    // Selection title
-    const selectionTitle = document.createElement('div');
-    selectionTitle.innerHTML = 'Escolha seu carro';
-    selectionTitle.style.color = '#fff';
-    selectionTitle.style.fontSize = '28px';
-    selectionTitle.style.marginBottom = '20px';
-    selectionTitle.style.fontWeight = 'bold';
-    carSelectionContainer.appendChild(selectionTitle);
-    
-    // Car display container
-    const carDisplayContainer = document.createElement('div');
-    carDisplayContainer.style.position = 'relative';
-    carDisplayContainer.style.width = '400px';
-    carDisplayContainer.style.height = '240px';
-    carDisplayContainer.style.marginBottom = '20px';
-    carDisplayContainer.style.background = 'linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7))';
-    carDisplayContainer.style.borderRadius = '12px';
-    carDisplayContainer.style.padding = '10px';
-    carDisplayContainer.style.boxShadow = '0 8px 32px 0 rgba(0,0,0,0.3)';
-    carDisplayContainer.style.display = 'flex';
-    carDisplayContainer.style.justifyContent = 'center';
-    carDisplayContainer.style.alignItems = 'flex-end';
-    carSelectionContainer.appendChild(carDisplayContainer);
-    
-    // Car display - mini renderer for car preview
-    const carPreviewRenderer = document.createElement('div');
-    carPreviewRenderer.id = 'car-preview';
-    carPreviewRenderer.style.width = '100%';
-    carPreviewRenderer.style.height = '100%';
-    carPreviewRenderer.style.borderRadius = '8px';
-    carPreviewRenderer.style.overflow = 'hidden';
-    carDisplayContainer.appendChild(carPreviewRenderer);
-    
-    // Car information
-    const carInfoContainer = document.createElement('div');
-    carInfoContainer.style.display = 'flex';
-    carInfoContainer.style.flexDirection = 'column';
-    carInfoContainer.style.alignItems = 'center';
-    carInfoContainer.style.marginBottom = '20px';
-    carSelectionContainer.appendChild(carInfoContainer);
-    
-    const carName = document.createElement('div');
-    carName.id = 'car-name';
-    carName.style.color = '#FFD700';
-    carName.style.fontSize = '24px';
-    carName.style.fontWeight = 'bold';
-    carName.style.marginBottom = '8px';
-    carInfoContainer.appendChild(carName);
-    
-    const carDescription = document.createElement('div');
-    carDescription.id = 'car-description';
-    carDescription.style.color = '#CCC';
-    carDescription.style.fontSize = '16px';
-    carDescription.style.textAlign = 'center';
-    carDescription.style.maxWidth = '380px';
-    carInfoContainer.appendChild(carDescription);
-    
-    // Navigation buttons
-    const navButtonsContainer = document.createElement('div');
-    navButtonsContainer.style.display = 'flex';
-    navButtonsContainer.style.width = '100%';
-    navButtonsContainer.style.justifyContent = 'space-between';
-    navButtonsContainer.style.padding = '0 80px';
-    carSelectionContainer.appendChild(navButtonsContainer);
-    
-    // Previous car button
-    const prevButton = document.createElement('button');
-    prevButton.innerHTML = '< Anterior';
-    prevButton.style.padding = '10px 20px';
-    prevButton.style.fontSize = '16px';
-    prevButton.style.background = 'rgba(255, 255, 255, 0.2)';
-    prevButton.style.color = 'white';
-    prevButton.style.border = 'none';
-    prevButton.style.borderRadius = '8px';
-    prevButton.style.cursor = 'pointer';
-    prevButton.style.transition = 'background 0.2s';
-    prevButton.onmouseenter = () => prevButton.style.background = 'rgba(255, 255, 255, 0.3)';
-    prevButton.onmouseleave = () => prevButton.style.background = 'rgba(255, 255, 255, 0.2)';
-    navButtonsContainer.appendChild(prevButton);
-    
-    // Next car button
-    const nextButton = document.createElement('button');
-    nextButton.innerHTML = 'Próximo >';
-    nextButton.style.padding = '10px 20px';
-    nextButton.style.fontSize = '16px';
-    nextButton.style.background = 'rgba(255, 255, 255, 0.2)';
-    nextButton.style.color = 'white';
-    nextButton.style.border = 'none';
-    nextButton.style.borderRadius = '8px';
-    nextButton.style.cursor = 'pointer';
-    nextButton.style.transition = 'background 0.2s';
-    nextButton.onmouseenter = () => nextButton.style.background = 'rgba(255, 255, 255, 0.3)';
-    nextButton.onmouseleave = () => nextButton.style.background = 'rgba(255, 255, 255, 0.2)';
-    navButtonsContainer.appendChild(nextButton);
-    
-    // Set up button event listeners
-    prevButton.addEventListener('click', () => {
-        selectedCarIndex = (selectedCarIndex - 1 + carModels.length) % carModels.length;
-        updateCarPreview();
-    });
-    
-    nextButton.addEventListener('click', () => {
-        selectedCarIndex = (selectedCarIndex + 1) % carModels.length;
-        updateCarPreview();
-    });
-    
-    return carSelectionContainer;
-}
+
 
 // Setup for car preview
 let carPreviewScene, carPreviewCamera, carPreviewRenderer;
@@ -1764,18 +1666,6 @@ function initCarPreview() {
     dirLight.position.set(5, 10, 5);
     carPreviewScene.add(dirLight);
     
-    // Add a simple floor
-    const floorGeometry = new THREE.PlaneGeometry(20, 20);
-    const floorMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0x333333,
-        roughness: 0.8,
-        metalness: 0.2
-    });
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -0.5;
-    floor.receiveShadow = true;
-    carPreviewScene.add(floor);
     
     // Add renderer to the DOM
     document.getElementById('car-preview').appendChild(carPreviewRenderer.domElement);
@@ -1805,6 +1695,9 @@ function animateCarPreview() {
     // Rotate car model for better visualization
     if (carPreviewModel) {
         carPreviewModel.rotation.y += 0.01;
+        carPreviewModel.rotation.x = Math.sin(Date.now() * 0.001) * 0.1; // Adiciona leve movimento de oscilação
+        carPreviewModel.position.x = -1;
+        carPreviewModel.position.z = -1;
     }
     
     carPreviewRenderer.render(carPreviewScene, carPreviewCamera);
@@ -1823,7 +1716,7 @@ startScreen.style.flexDirection = 'column';
 startScreen.style.alignItems = 'center';
 startScreen.style.justifyContent = 'center';
 startScreen.style.zIndex = '2000';
-startScreen.style.transition = 'opacity 0.7s';
+startScreen.style.transition = 'opacity 0.s';
 startScreen.style.opacity = '1';
 startScreen.style.overflow = 'auto';
 
@@ -1831,25 +1724,24 @@ startScreen.style.overflow = 'auto';
 const title = document.createElement('div');
 title.innerHTML = 'HYPER DRIVE';
 title.style.color = '#FFD700';
-title.style.fontSize = '72px';
+title.style.fontSize = '48px'; // um pouco maior
 title.style.fontWeight = 'bold';
-title.style.letterSpacing = '8px';
-title.style.textShadow = '0 8px 32px #000, 0 2px 0 #fff';
-title.style.marginBottom = '24px';
-title.style.marginTop = '48px';
+title.style.letterSpacing = '5px';
+title.style.textShadow = '0 4px 16px #000, 0 1px 0 #fff';
+title.style.marginBottom = '16px';
+title.style.marginTop = '32px';
 title.style.fontFamily = 'Orbitron, Arial, sans-serif';
 startScreen.appendChild(title);
-
 
 // Subtítulo
 const subtitle = document.createElement('div');
 subtitle.innerHTML = 'Desvie dos carros e faça a maior pontuação!';
 subtitle.style.color = '#fff';
-subtitle.style.fontSize = '26px';
-subtitle.style.marginBottom = '48px';
+subtitle.style.fontSize = '20px'; // um pouco maior
+subtitle.style.marginBottom = '28px';
 subtitle.style.textAlign = 'center';
 subtitle.style.fontFamily = 'Montserrat, Arial, sans-serif';
-subtitle.style.textShadow = '0 2px 8px #000';
+subtitle.style.textShadow = '0 1px 4px #000';
 startScreen.appendChild(subtitle);
 
 // Car selection container
@@ -1857,13 +1749,13 @@ const carSelectionContainer = document.createElement('div');
 carSelectionContainer.style.display = 'flex';
 carSelectionContainer.style.flexDirection = 'column';
 carSelectionContainer.style.alignItems = 'center';
-carSelectionContainer.style.marginBottom = '40px';
+carSelectionContainer.style.marginBottom = '24px';
 carSelectionContainer.style.width = '100%';
-carSelectionContainer.style.maxWidth = '600px';
+carSelectionContainer.style.maxWidth = '420px'; // maior
 carSelectionContainer.style.background = 'rgba(30,30,50,0.85)';
-carSelectionContainer.style.borderRadius = '18px';
-carSelectionContainer.style.boxShadow = '0 8px 32px 0 rgba(0,0,0,0.45)';
-carSelectionContainer.style.padding = '32px 24px 24px 24px';
+carSelectionContainer.style.borderRadius = '16px';
+carSelectionContainer.style.boxShadow = '0 4px 16px 0 rgba(0,0,0,0.45)';
+carSelectionContainer.style.padding = '22px 16px 18px 16px';
 carSelectionContainer.style.backdropFilter = 'blur(2px)';
 startScreen.appendChild(carSelectionContainer);
 
@@ -1871,23 +1763,23 @@ startScreen.appendChild(carSelectionContainer);
 const selectionTitle = document.createElement('div');
 selectionTitle.innerHTML = 'Escolha seu carro';
 selectionTitle.style.color = '#FFD700';
-selectionTitle.style.fontSize = '32px';
-selectionTitle.style.marginBottom = '18px';
+selectionTitle.style.fontSize = '22px';
+selectionTitle.style.marginBottom = '10px';
 selectionTitle.style.fontWeight = 'bold';
-selectionTitle.style.letterSpacing = '2px';
+selectionTitle.style.letterSpacing = '1px';
 selectionTitle.style.fontFamily = 'Orbitron, Arial, sans-serif';
 carSelectionContainer.appendChild(selectionTitle);
 
 // Car display container (preview 3D)
 const carDisplayContainer = document.createElement('div');
 carDisplayContainer.style.position = 'relative';
-carDisplayContainer.style.width = '420px';
-carDisplayContainer.style.height = '240px';
-carDisplayContainer.style.marginBottom = '18px';
+carDisplayContainer.style.width = '320px'; // maior
+carDisplayContainer.style.height = '170px'; // maior
+carDisplayContainer.style.marginBottom = '10px';
 carDisplayContainer.style.background = 'linear-gradient(120deg, #23243a 60%, #3a2c4a 100%)';
-carDisplayContainer.style.borderRadius = '16px';
-carDisplayContainer.style.padding = '10px';
-carDisplayContainer.style.boxShadow = '0 8px 32px 0 rgba(0,0,0,0.3)';
+carDisplayContainer.style.borderRadius = '12px';
+carDisplayContainer.style.padding = '6px';
+carDisplayContainer.style.boxShadow = '0 4px 16px 0 rgba(0,0,0,0.3)';
 carDisplayContainer.style.display = 'flex';
 carDisplayContainer.style.justifyContent = 'center';
 carDisplayContainer.style.alignItems = 'flex-end';
@@ -1898,7 +1790,7 @@ const carPreviewRendererDiv = document.createElement('div');
 carPreviewRendererDiv.id = 'car-preview';
 carPreviewRendererDiv.style.width = '100%';
 carPreviewRendererDiv.style.height = '100%';
-carPreviewRendererDiv.style.borderRadius = '12px';
+carPreviewRendererDiv.style.borderRadius = '10px';
 carPreviewRendererDiv.style.overflow = 'hidden';
 carDisplayContainer.appendChild(carPreviewRendererDiv);
 
@@ -1907,24 +1799,24 @@ const carInfoContainer = document.createElement('div');
 carInfoContainer.style.display = 'flex';
 carInfoContainer.style.flexDirection = 'column';
 carInfoContainer.style.alignItems = 'center';
-carInfoContainer.style.marginBottom = '18px';
+carInfoContainer.style.marginBottom = '10px';
 carSelectionContainer.appendChild(carInfoContainer);
 
 const carName = document.createElement('div');
 carName.id = 'car-name';
 carName.style.color = '#FFD700';
-carName.style.fontSize = '26px';
+carName.style.fontSize = '18px';
 carName.style.fontWeight = 'bold';
-carName.style.marginBottom = '8px';
+carName.style.marginBottom = '4px';
 carName.style.fontFamily = 'Orbitron, Arial, sans-serif';
 carInfoContainer.appendChild(carName);
 
 const carDescription = document.createElement('div');
 carDescription.id = 'car-description';
 carDescription.style.color = '#CCC';
-carDescription.style.fontSize = '17px';
+carDescription.style.fontSize = '13px';
 carDescription.style.textAlign = 'center';
-carDescription.style.maxWidth = '380px';
+carDescription.style.maxWidth = '260px';
 carDescription.style.fontFamily = 'Montserrat, Arial, sans-serif';
 carInfoContainer.appendChild(carDescription);
 
@@ -1933,17 +1825,17 @@ const navButtonsContainer = document.createElement('div');
 navButtonsContainer.style.display = 'flex';
 navButtonsContainer.style.width = '100%';
 navButtonsContainer.style.justifyContent = 'space-between';
-navButtonsContainer.style.padding = '0 80px';
+navButtonsContainer.style.padding = '0 28px';
 carSelectionContainer.appendChild(navButtonsContainer);
 
 const prevButton = document.createElement('button');
-prevButton.innerHTML = '< Anterior';
-prevButton.style.padding = '12px 28px';
-prevButton.style.fontSize = '18px';
+prevButton.innerHTML = '<';
+prevButton.style.padding = '8px 18px';
+prevButton.style.fontSize = '16px';
 prevButton.style.background = 'linear-gradient(90deg, #23243a 0%, #3a2c4a 100%)';
 prevButton.style.color = '#FFD700';
 prevButton.style.border = 'none';
-prevButton.style.borderRadius = '10px';
+prevButton.style.borderRadius = '8px';
 prevButton.style.cursor = 'pointer';
 prevButton.style.fontWeight = 'bold';
 prevButton.style.transition = 'background 0.2s, color 0.2s';
@@ -1958,13 +1850,13 @@ prevButton.onmouseleave = () => {
 navButtonsContainer.appendChild(prevButton);
 
 const nextButton = document.createElement('button');
-nextButton.innerHTML = 'Próximo >';
-nextButton.style.padding = '12px 28px';
-nextButton.style.fontSize = '18px';
+nextButton.innerHTML = '>';
+nextButton.style.padding = '8px 18px';
+nextButton.style.fontSize = '16px';
 nextButton.style.background = 'linear-gradient(90deg, #23243a 0%, #3a2c4a 100%)';
 nextButton.style.color = '#FFD700';
 nextButton.style.border = 'none';
-nextButton.style.borderRadius = '10px';
+nextButton.style.borderRadius = '8px';
 nextButton.style.cursor = 'pointer';
 nextButton.style.fontWeight = 'bold';
 nextButton.style.transition = 'background 0.2s, color 0.2s';
@@ -1991,17 +1883,17 @@ nextButton.addEventListener('click', () => {
 // Botão de iniciar
 const startButton = document.createElement('button');
 startButton.innerHTML = 'Jogar';
-startButton.style.padding = '20px 80px';
-startButton.style.fontSize = '32px';
+startButton.style.padding = '14px 54px';
+startButton.style.fontSize = '22px';
 startButton.style.background = 'linear-gradient(90deg, #FFD700 0%, #FF5500 100%)';
 startButton.style.color = '#23243a';
 startButton.style.border = 'none';
-startButton.style.borderRadius = '16px';
+startButton.style.borderRadius = '12px';
 startButton.style.cursor = 'pointer';
 startButton.style.fontWeight = 'bold';
 startButton.style.boxShadow = 'none';
 startButton.style.transition = 'transform 0.1s, background 0.3s';
-startButton.style.marginTop = '32px';
+startButton.style.marginTop = '18px';
 startButton.onmouseenter = () => startButton.style.transform = 'scale(1.08)';
 startButton.onmouseleave = () => startButton.style.transform = 'scale(1)';
 carSelectionContainer.appendChild(startButton);
