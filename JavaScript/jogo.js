@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
 
+let isNightMode = false;
+
 // Musica
 
 const bgMusic = document.createElement('audio');
@@ -80,6 +82,22 @@ let texture_dn = new THREE.TextureLoader().load("assets/texture/skybox/meadow_dn
 let texture_rt = new THREE.TextureLoader().load("assets/texture/skybox/meadow_rt.jpg");
 let texture_lf = new THREE.TextureLoader().load("assets/texture/skybox/meadow_lf.jpg");
 
+//Carregamento de cada face skybox2
+let texture_ft2 = new THREE.TextureLoader().load("assets/texture/skybox2/arid_ft.jpg");
+let texture_bk2 = new THREE.TextureLoader().load("assets/texture/skybox2/arid_bk.jpg");
+let texture_up2 = new THREE.TextureLoader().load("assets/texture/skybox2/arid_up.jpg");
+let texture_dn2 = new THREE.TextureLoader().load("assets/texture/skybox2/arid_dn.jpg");
+let texture_rt2 = new THREE.TextureLoader().load("assets/texture/skybox2/arid_rt.jpg");
+let texture_lf2 = new THREE.TextureLoader().load("assets/texture/skybox2/arid_lf.jpg");
+
+//Carregamento de cada face skybox3
+let texture_ft3 = new THREE.TextureLoader().load("assets/texture/skybox3/blizzard_ft.jpg");
+let texture_bk3 = new THREE.TextureLoader().load("assets/texture/skybox3/blizzard_bk.jpg");
+let texture_up3 = new THREE.TextureLoader().load("assets/texture/skybox3/blizzard_up.jpg");
+let texture_dn3 = new THREE.TextureLoader().load("assets/texture/skybox3/blizzard_dn.jpg");
+let texture_rt3 = new THREE.TextureLoader().load("assets/texture/skybox3/blizzard_rt.jpg");
+let texture_lf3 = new THREE.TextureLoader().load("assets/texture/skybox3/blizzard_lf.jpg");
+
 // Aplicação das texturas aos materiais para cada face do cubo
 materialArray.push(new THREE.MeshBasicMaterial({ map: texture_ft })); // frente
 materialArray.push(new THREE.MeshBasicMaterial({ map: texture_bk })); // trás
@@ -98,10 +116,6 @@ let skyboxGeo = new THREE.BoxGeometry(100, 100, 100);
 let skybox = new THREE.Mesh(skyboxGeo, materialArray);
 scene.add(skybox);
 
-// Luz adicional para melhorar a visibilidade
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(0, 10, 10);
-scene.add(light);
 
 // ===== ESTRADA =====
 // Carregamento e configuração da textura da estrada
@@ -520,6 +534,27 @@ function createBlueSportsCar() {
     rightTailLight.scale.set(1.3, 1.3, 0.4);
     carGroup.add(rightTailLight);
 
+    const leftHeadlightLight = new THREE.SpotLight(0xffee88, 1.2, 18, Math.PI / 6, 0.4, 1);
+    leftHeadlightLight.position.set(0.78, 0.78, 2.67);
+    leftHeadlightLight.target.position.set(0.78, 0.78, 5.5);
+    carGroup.add(leftHeadlightLight);
+    carGroup.add(leftHeadlightLight.target);
+
+    const rightHeadlightLight = new THREE.SpotLight(0xffee88, 1.2, 18, Math.PI / 6, 0.4, 1);
+    rightHeadlightLight.position.set(-0.78, 0.78, 2.67);
+    rightHeadlightLight.target.position.set(-0.78, 0.78, 5.5);
+    carGroup.add(rightHeadlightLight);
+    carGroup.add(rightHeadlightLight.target);
+
+    // Lanternas traseiras (luz vermelha)
+    const leftTailLightLight = new THREE.PointLight(0xff2222, 0.7, 4, 2);
+    leftTailLightLight.position.set(0.78, 0.78, -2.67);
+    carGroup.add(leftTailLightLight);
+
+    const rightTailLightLight = new THREE.PointLight(0xff2222, 0.7, 4, 2);
+    rightTailLightLight.position.set(-0.78, 0.78, -2.67);
+    carGroup.add(rightTailLightLight);
+
     // Rack no teto
     const roofRack = new THREE.Mesh(
         new THREE.BoxGeometry(1.8, 0.13, 1.95),
@@ -653,6 +688,7 @@ function createRedSportsCar() {
     rightHeadlight.position.set(-0.55, 0.68, 2.85);
     carGroup.add(rightHeadlight);
 
+
     // Lanternas traseiras horizontais
     const tailLightGeometry = new THREE.BoxGeometry(0.7, 0.13, 0.12);
     const tailLightMaterial = new THREE.MeshPhongMaterial({ color: 0xff2222, emissive: 0xff2222, emissiveIntensity: 0.7 });
@@ -662,6 +698,28 @@ function createRedSportsCar() {
     const rightTailLight = new THREE.Mesh(tailLightGeometry, tailLightMaterial);
     rightTailLight.position.set(-0.45, 0.7, -2.85);
     carGroup.add(rightTailLight);
+
+
+    const leftHeadlightLight = new THREE.SpotLight(0xffee88, 1.2, 18, Math.PI / 6, 0.4, 1);
+    leftHeadlightLight.position.set(0.78, 0.78, 2.67);
+    leftHeadlightLight.target.position.set(0.78, 0.78, 5.5);
+    carGroup.add(leftHeadlightLight);
+    carGroup.add(leftHeadlightLight.target);
+
+    const rightHeadlightLight = new THREE.SpotLight(0xffee88, 1.2, 18, Math.PI / 6, 0.4, 1);
+    rightHeadlightLight.position.set(-0.78, 0.78, 2.67);
+    rightHeadlightLight.target.position.set(-0.78, 0.78, 5.5);
+    carGroup.add(rightHeadlightLight);
+    carGroup.add(rightHeadlightLight.target);
+
+    // Lanternas traseiras (luz vermelha)
+    const leftTailLightLight = new THREE.PointLight(0xff2222, 0.7, 4, 2);
+    leftTailLightLight.position.set(0.78, 0.78, -2.67);
+    carGroup.add(leftTailLightLight);
+
+    const rightTailLightLight = new THREE.PointLight(0xff2222, 0.7, 4, 2);
+    rightTailLightLight.position.set(-0.78, 0.78, -2.67);
+    carGroup.add(rightTailLightLight);
 
     // Faixa esportiva central preta
     const centerStripe = new THREE.Mesh(
@@ -841,6 +899,27 @@ function createGreenSportsCar() {
     rightTailLight.scale.set(1.1, 1.1, 0.5);
     carGroup.add(rightTailLight);
 
+    const leftHeadlightLight = new THREE.SpotLight(0xffee88, 1.2, 18, Math.PI / 6, 0.4, 1);
+    leftHeadlightLight.position.set(0.78, 0.78, 2.67);
+    leftHeadlightLight.target.position.set(0.78, 0.78, 5.5);
+    carGroup.add(leftHeadlightLight);
+    carGroup.add(leftHeadlightLight.target);
+
+    const rightHeadlightLight = new THREE.SpotLight(0xffee88, 1.2, 18, Math.PI / 6, 0.4, 1);
+    rightHeadlightLight.position.set(-0.78, 0.78, 2.67);
+    rightHeadlightLight.target.position.set(-0.78, 0.78, 5.5);
+    carGroup.add(rightHeadlightLight);
+    carGroup.add(rightHeadlightLight.target);
+
+    // Lanternas traseiras (luz vermelha)
+    const leftTailLightLight = new THREE.PointLight(0xff2222, 0.7, 4, 2);
+    leftTailLightLight.position.set(0.78, 0.78, -2.67);
+    carGroup.add(leftTailLightLight);
+
+    const rightTailLightLight = new THREE.PointLight(0xff2222, 0.7, 4, 2);
+    rightTailLightLight.position.set(-0.78, 0.78, -2.67);
+    carGroup.add(rightTailLightLight);
+
     // Detalhe lateral esportivo
     const sideStripe = new THREE.Mesh(
         new THREE.BoxGeometry(2.8, 0.07, 5.2),
@@ -974,6 +1053,27 @@ function createYellowSportsCar() {
     rightTailLight.position.set(-0.7, 0.7, -3.0);
     rightTailLight.scale.set(1.1, 1.1, 0.5);
     carGroup.add(rightTailLight);
+
+    const leftHeadlightLight = new THREE.SpotLight(0xffee88, 1.2, 18, Math.PI / 6, 0.4, 1);
+    leftHeadlightLight.position.set(0.78, 0.78, 2.67);
+    leftHeadlightLight.target.position.set(0.78, 0.78, 5.5);
+    carGroup.add(leftHeadlightLight);
+    carGroup.add(leftHeadlightLight.target);
+
+    const rightHeadlightLight = new THREE.SpotLight(0xffee88, 1.2, 18, Math.PI / 6, 0.4, 1);
+    rightHeadlightLight.position.set(-0.78, 0.78, 2.67);
+    rightHeadlightLight.target.position.set(-0.78, 0.78, 5.5);
+    carGroup.add(rightHeadlightLight);
+    carGroup.add(rightHeadlightLight.target);
+
+    // Lanternas traseiras (luz vermelha)
+    const leftTailLightLight = new THREE.PointLight(0xff2222, 0.7, 4, 2);
+    leftTailLightLight.position.set(0.78, 0.78, -2.67);
+    carGroup.add(leftTailLightLight);
+
+    const rightTailLightLight = new THREE.PointLight(0xff2222, 0.7, 4, 2);
+    rightTailLightLight.position.set(-0.78, 0.78, -2.67);
+    carGroup.add(rightTailLightLight);
 
     // Detalhe esportivo no capô
     const hoodDetail = new THREE.Mesh(
@@ -1540,6 +1640,47 @@ cameraToggle.style.borderRadius = '3px';
 cameraToggle.style.color = 'white';
 cameraSection.appendChild(cameraToggle);
 
+
+function applyNightMode(night) {
+    if (night) {
+        // Escurece o ambiente
+        ambientLight.intensity = 0.18;
+        directionalLight.intensity = 0.15;
+        pointLight.intensity = 0.7;
+        scene.background = new THREE.Color(0x0a0a18);
+
+        // Escurece o skybox (opcional: use uma textura de céu noturno se tiver)
+        for (let i = 0; i < 6; i++) {
+            materialArray[i].color = new THREE.Color(0x111122);
+            materialArray[i].needsUpdate = true;
+        }
+
+        // Aumenta a intensidade dos faróis dos carros (se quiser)
+        scene.traverse(obj => {
+            if (obj.isSpotLight && obj.color.getHex() === 0xffee88) obj.intensity = 2.2;
+            if (obj.isPointLight && obj.color.getHex() === 0xff2222) obj.intensity = 1.2;
+        });
+    } else {
+        // Volta ao modo dia
+        ambientLight.intensity = 0.6;
+        directionalLight.intensity = 0.8;
+        pointLight.intensity = 1.5;
+        scene.background = null;
+
+        // Restaura o skybox normal
+        for (let i = 0; i < 6; i++) {
+            materialArray[i].color = new THREE.Color(0xffffff);
+            materialArray[i].needsUpdate = true;
+        }
+
+        // Restaura intensidade dos faróis
+        scene.traverse(obj => {
+            if (obj.isSpotLight && obj.color.getHex() === 0xffee88) obj.intensity = 1.2;
+            if (obj.isPointLight && obj.color.getHex() === 0xff2222) obj.intensity = 0.7;
+        });
+    }
+}
+
 // Variáveis de controle da câmera
 let currentCamera = camera; // Usa a câmera existente como padrão (perspectiva)
 let usingPerspective = true;
@@ -1636,7 +1777,24 @@ railElements.push(rightTopRail2);
 railElements.push(rightMiddleRail2);
 
 // Add before the startScreen initialization
+//botao noite
+const nightModeButton = document.createElement('button');
+nightModeButton.innerHTML = '🌙 Modo Noite';
+nightModeButton.style.width = '100%';
+nightModeButton.style.padding = '8px';
+nightModeButton.style.marginTop = '10px';
+nightModeButton.style.backgroundColor = '#23243a';
+nightModeButton.style.color = '#FFD700';
+nightModeButton.style.border = 'none';
+nightModeButton.style.borderRadius = '6px';
+nightModeButton.style.cursor = 'pointer';
+controlsPanel.appendChild(nightModeButton);
 
+nightModeButton.addEventListener('click', () => {
+    isNightMode = !isNightMode;
+    applyNightMode(isNightMode);
+    nightModeButton.innerHTML = isNightMode ? '☀️ Modo Dia' : '🌙 Modo Noite';
+});
 
 
 // Setup for car preview
@@ -1719,6 +1877,105 @@ startScreen.style.zIndex = '2000';
 startScreen.style.transition = 'opacity 0.s';
 startScreen.style.opacity = '1';
 startScreen.style.overflow = 'auto';
+
+
+// Adicione antes do startScreen.appendChild(title);
+let selectedTerrain = 0; // 0 = normal, 1 = deserto
+
+// Botões de seleção de terreno
+const terrainContainer = document.createElement('div');
+terrainContainer.style.display = 'flex';
+terrainContainer.style.flexDirection = 'column'; // <-- vertical
+terrainContainer.style.alignItems = 'flex-end';   // <-- alinha à direita
+terrainContainer.style.position = 'absolute';     // <-- posiciona absoluto
+terrainContainer.style.top = '300px';              // <-- distância do topo
+terrainContainer.style.right = '200px';            // <-- distância da direita
+terrainContainer.style.gap = '18px';
+terrainContainer.style.zIndex = '2100'; 
+
+const normalButton = document.createElement('button');
+normalButton.innerHTML = 'Terreno Normal';
+normalButton.style.padding = '10px 28px';
+normalButton.style.fontSize = '16px';
+normalButton.style.background = 'linear-gradient(90deg, #2b2d42 0%, #3a2c4a 100%)';
+normalButton.style.color = '#FFD700';
+normalButton.style.border = 'none';
+normalButton.style.borderRadius = '8px';
+normalButton.style.cursor = 'pointer';
+normalButton.style.fontWeight = 'bold';
+normalButton.style.transition = 'background 0.2s, color 0.2s, transform 0.1s';
+normalButton.style.boxShadow = '0 2px 8px 0 rgba(0,0,0,0.15)';
+normalButton.style.outline = '2px solid #FFD700';
+
+const desertButton = document.createElement('button');
+desertButton.innerHTML = 'Terreno Deserto';
+desertButton.style.padding = '10px 28px';
+desertButton.style.fontSize = '16px';
+desertButton.style.background = 'linear-gradient(90deg, #FFD700 0%, #FF5500 100%)';
+desertButton.style.color = '#23243a';
+desertButton.style.border = 'none';
+desertButton.style.borderRadius = '8px';
+desertButton.style.cursor = 'pointer';
+desertButton.style.fontWeight = 'bold';
+desertButton.style.transition = 'background 0.2s, color 0.2s, transform 0.1s';
+desertButton.style.boxShadow = '0 2px 8px 0 rgba(0,0,0,0.15)';
+desertButton.style.outline = 'none';
+
+const neveButton = document.createElement('button');
+neveButton.innerHTML = 'Terreno Neve';
+neveButton.style.padding = '10px 28px';
+neveButton.style.fontSize = '16px';
+neveButton.style.background = 'linear-gradient(90deg, #FFD700 0%, #FF5500 100%)';
+neveButton.style.color = '#23243a';
+neveButton.style.border = 'none';
+neveButton.style.borderRadius = '8px';
+neveButton.style.cursor = 'pointer';
+neveButton.style.fontWeight = 'bold';
+neveButton.style.transition = 'background 0.2s, color 0.2s, transform 0.1s';
+neveButton.style.boxShadow = '0 2px 8px 0 rgba(0,0,0,0.15)';
+neveButton.style.outline = 'none';
+
+terrainContainer.appendChild(normalButton);
+terrainContainer.appendChild(desertButton);
+terrainContainer.appendChild(neveButton);
+startScreen.appendChild(terrainContainer);
+
+// Troca visual e estado ao clicar
+function updateTerrainButtons() {
+    // Resetar todos para o estado "não selecionado"
+    normalButton.style.outline = 'none';
+    normalButton.style.background = 'linear-gradient(90deg, #FFD700 0%, #FF5500 100%)';
+    normalButton.style.color = '#23243a';
+
+    desertButton.style.outline = 'none';
+    desertButton.style.background = 'linear-gradient(90deg, #FFD700 0%, #FF5500 100%)';
+    desertButton.style.color = '#23243a';
+
+    neveButton.style.outline = 'none';
+    neveButton.style.background = 'linear-gradient(90deg, #FFD700 0%, #FF5500 100%)';
+    neveButton.style.color = '#23243a';
+
+    // Destaca o selecionado
+    if (selectedTerrain === 0) {
+        normalButton.style.outline = '2px solid #FFD700';
+        normalButton.style.background = 'linear-gradient(90deg, #2b2d42 0%, #3a2c4a 100%)';
+        normalButton.style.color = '#FFD700';
+    } else if (selectedTerrain === 1) {
+        desertButton.style.outline = '2px solid #FFD700';
+        desertButton.style.background = 'linear-gradient(90deg, #2b2d42 0%, #3a2c4a 100%)';
+        desertButton.style.color = '#FFD700';
+    } else if (selectedTerrain === 2) {
+        neveButton.style.outline = '2px solid #FFD700';
+        neveButton.style.background = 'linear-gradient(90deg, #2b2d42 0%, #3a2c4a 100%)';
+        neveButton.style.color = '#FFD700';
+    }
+}
+normalButton.onclick = () => { selectedTerrain = 0; updateTerrainButtons(); };
+desertButton.onclick = () => { selectedTerrain = 1; updateTerrainButtons(); };
+neveButton.onclick = () => { selectedTerrain = 2; updateTerrainButtons(); };
+
+
+updateTerrainButtons();
 
 // Título estilizado
 const title = document.createElement('div');
@@ -1917,6 +2174,36 @@ let car;
 startButton.addEventListener('click', startGame);
 
 function startGame() {
+    if (selectedTerrain === 0) {
+        // Terreno normal
+        materialArray[0].map = texture_ft;
+        materialArray[1].map = texture_bk;
+        materialArray[2].map = texture_up;
+        materialArray[3].map = texture_dn;
+        materialArray[4].map = texture_rt;
+        materialArray[5].map = texture_lf;
+    } else if (selectedTerrain === 1) {
+        // Terreno deserto
+        materialArray[0].map = texture_ft2;
+        materialArray[1].map = texture_bk2;
+        materialArray[2].map = texture_up2;
+        materialArray[3].map = texture_dn2;
+        materialArray[4].map = texture_rt2;
+        materialArray[5].map = texture_lf2;
+    }else if (selectedTerrain === 2) {
+        // Terreno neve
+        materialArray[0].map = texture_ft3;
+        materialArray[1].map = texture_bk3;
+        materialArray[2].map = texture_up3;
+        materialArray[3].map = texture_dn3;
+        materialArray[4].map = texture_rt3;
+        materialArray[5].map = texture_lf3;
+    }
+
+    // Atualiza as texturas do skybox
+    for (let i = 0; i < 6; i++) {
+        materialArray[i].needsUpdate = true;
+    }
     car = carModels[selectedCarIndex].createFunction();
     car.position.set(0, 0.1, 5);
     car.rotation.y = Math.PI;
