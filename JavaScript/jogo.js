@@ -346,31 +346,80 @@ function initializeAirplane() {
     scene.add(airplane);
 }
 
-// Atualiza o movimento do avião
+let airplaneTargetYRotation = 0;
+let airplaneTurning = false;
+
+// Variáveis para o loop (mortal)
+let airplaneLooping = false;
+let airplaneLoopProgress = 0;
+let nextLoopTime = Date.now() + 8000 + Math.random() * 7000; // Próximo loop entre 8 e 15s
+
 function updateAirplane(deltaTime) {
     if (!airplane) return;
 
-    // Movimento lateral
-    airplane.position.x += AIRPLANE_SPEED * airplaneDirection * deltaTime * 60;
+    const t = Date.now() * 0.0005;
+    const prevX = airplane.position.x;
+    const newX = Math.sin(t) * AIRPLANE_TURN_POINT;
+
+    // --- LOOP (MORTAL) ---
+    // Inicia o loop se chegou a hora e não está virando
+    if (!airplaneLooping && !airplaneTurning && Date.now() > nextLoopTime) {
+        airplaneLooping = true;
+        airplaneLoopProgress = 0;
+        nextLoopTime = Date.now() + 8000 + Math.random() * 7000; // Próximo loop aleatório
+    }
+
+    // Animação do loop (gira no eixo X)
+    if (airplaneLooping) {
+        const loopDuration = 1.2; // segundos
+        airplaneLoopProgress += deltaTime;
+        // Gira 360° no eixo X durante o loop
+        airplane.rotation.x = Math.PI * 2 * (airplaneLoopProgress / loopDuration) + Math.cos(t * 2) * 0.08;
+        if (airplaneLoopProgress >= loopDuration) {
+            airplaneLooping = false;
+            airplane.rotation.x = Math.cos(t * 2) * 0.08; // volta ao normal
+        }
+    } else {
+        // Inclinação normal
+        airplane.rotation.x = Math.cos(t * 2) * 0.08;
+    }
+
+    // Movimento lateral (zig-zag com curva suave)
+    // ...restante do seu código...
+    // Detecta se chegou no extremo e precisa virar
+    if (!airplaneTurning) {
+        if (airplaneDirection === 1 && newX >= AIRPLANE_TURN_POINT - 0.5) {
+            airplaneDirection = -1;
+            airplaneTargetYRotation += Math.PI;
+            airplaneTurning = true;
+        } else if (airplaneDirection === -1 && newX <= -AIRPLANE_TURN_POINT + 0.5) {
+            airplaneDirection = 1;
+            airplaneTargetYRotation -= Math.PI;
+            airplaneTurning = true;
+        }
+    }
+    if (airplaneTurning) {
+        const diff = airplaneTargetYRotation - airplane.rotation.y;
+        const step = Math.sign(diff) * Math.min(Math.abs(diff), 2.5 * deltaTime);
+        airplane.rotation.y += step;
+        if (Math.abs(diff) < 0.05) {
+            airplane.rotation.y = airplaneTargetYRotation;
+            airplaneTurning = false;
+        }
+    }
+
+    airplane.position.x = newX;
+    airplane.position.y = AIRPLANE_HEIGHT + Math.sin(t * 2) * 2 + Math.cos(t * 1.5) * 0.7;
+    airplane.position.z = -40 + Math.cos(t * 1.2) * 8;
+
+    // Inclinação do avião conforme curva (banking)
+    airplane.rotation.z = -Math.sin(t) * 0.4;
 
     // Rotação da hélice
     if (airplane.children.length > 6) {
-        airplane.children[6].rotation.x += 0.2 * deltaTime * 60; // Pá 1
-        airplane.children[7].rotation.z += 0.2 * deltaTime * 60; // Pá 2
+        airplane.children[6].rotation.x += 0.2 * deltaTime * 60;
+        airplane.children[7].rotation.z += 0.2 * deltaTime * 60;
     }
-
-    // Verifica se precisa inverter a direção
-    if (airplaneDirection > 0 && airplane.position.x > AIRPLANE_TURN_POINT) {
-        airplaneDirection = -1;
-        airplane.rotation.y = Math.PI; // gira 180 graus
-    } else if (airplaneDirection < 0 && airplane.position.x < -AIRPLANE_TURN_POINT) {
-        airplaneDirection = 1;
-        airplane.rotation.y = 0; // volta à rotação original
-    }
-
-    // Pequena oscilação vertical para parecer mais realista
-    const time = Date.now() * 0.001;
-    airplane.position.y = AIRPLANE_HEIGHT + Math.sin(time * 0.5) * 0.5;
 }
 
 
